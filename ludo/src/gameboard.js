@@ -9,17 +9,36 @@
 
 */
 // write a gameboard class to implement the ludo rules
+var colorMap = {
+  color1: "red",
+  color2: "blue",
+  color3: "green",
+  color4: "yellow",
+};
+var position = { board: "board", homeSquare: "homesquare" };
 
 class GameBoard {
   constructor() {
     this.board = new Array(52).fill(null);
-    this.players = [];
-    // 4 single array or 4x4 matrix
-
-  }
-
-  addPlayer(player) {
-    this.players.push(player);
+    this.safeBoxes = [0, 8, 13, 21, 26, 34, 39, 47];
+    this.startBoxes = {
+      [colorMap.color1]: 0,
+      [colorMap.color2]: 13,
+      [colorMap.color3]: 26,
+      [colorMap.color4]: 39,
+    };
+    this.endBoxes = {
+      [colorMap.color1]: 51,
+      [colorMap.color2]: 11,
+      [colorMap.color3]: 24,
+      [colorMap.color4]: 37,
+    };
+    this.homeSquares = {
+      [colorMap.color1]: new Array(6).fill(null),
+      [colorMap.color2]: new Array(6).fill(null),
+      [colorMap.color3]: new Array(6).fill(null),
+      [colorMap.color4]: new Array(6).fill(null),
+    };
   }
 
   movePiece(player, piece, steps) {
@@ -36,5 +55,3 @@ class GameBoard {
     // check if all pieces are in the end circle
   }
 }
-
-
