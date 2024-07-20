@@ -20,12 +20,6 @@
     "buildcss-dev": "npx tailwindcss -i ./src/input.css -o ./src/index.css --watch",
     "buildcss-prod": "npx tailwindcss -i ./src/input.css -o ./src/index.css --minify"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",
