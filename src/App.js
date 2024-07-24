@@ -1,8 +1,6 @@
 import "./App.css";
-import { GameBoard } from "./components/GameBoard";
+import { LandingPage } from "./components/LandingPage";
 
 export default function App() {
-  return (
-    <GameBoard />
-  );
+  return <LandingPage />;
 }
