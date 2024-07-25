@@ -9,7 +9,7 @@ export default function App() {
     setStart(state);
   };
   return startGame ? (
-    <GameBoard />
+    <GameBoard startGameHandler={startGameHandler} />
   ) : (
     <LandingPage startGameHandler={startGameHandler} />
   );
