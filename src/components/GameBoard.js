@@ -1,7 +1,9 @@
 import { ActionButton } from "./Button";
 import { HomeBox } from "./HomeBox";
 import { MoveBox } from "./MoveBox";
+import { WinningBox } from "./WinningBox";
 import { COLORS, COLOR_SEQUENCE, CORNER_INDICES } from "../constants";
+import { Dice } from "./Dice";
 
 export function GameBoard({ startGameHandler }) {
   const player_color = localStorage.getItem("selectedColor");
@@ -45,13 +47,26 @@ export function GameBoard({ startGameHandler }) {
             <HomeBox color={corner_color_map.top_right} />
           </div>
 
-          {Array(60)
+          {Array(21)
             .fill(1)
             .map((option, i) => {
               return (
                 <MoveBox
                   color={corner_color_map[CORNER_INDICES[i + 4]]}
                   idx={i + 4}
+                />
+              );
+            })}
+          <div className="col-span-3 row-span-3">
+            <WinningBox color={corner_color_map.top_right} />
+          </div>
+          {Array(30)
+            .fill(1)
+            .map((option, i) => {
+              return (
+                <MoveBox
+                  color={corner_color_map[CORNER_INDICES[i + 25]]}
+                  idx={i + 25}
                 />
               );
             })}
@@ -77,7 +92,9 @@ export function GameBoard({ startGameHandler }) {
               );
             })}
         </div>
-        <div>DIE AND STATS HERE</div>
+        <div>
+          <Dice />
+        </div>
       </div>
     </>
   );
