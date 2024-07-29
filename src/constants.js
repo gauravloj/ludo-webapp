@@ -13,11 +13,11 @@ export const COLORS_HEX = {
   purple: "#9333EA",
   white: "#FFFFFF",
   black: "#000000",
-  "bg-lime-600": "#65A30D",
-  "bg-cyan-400": "#22D3EE",
-  "bg-rose-600": "#E11D48",
-  "bg-purple-600": "#9333EA",
-  "bg-white": "#FFFFFF",
+  [COLORS.lime]: "#65A30D",
+  [COLORS.cyan]: "#22D3EE",
+  [COLORS.rose]: "#E11D48",
+  [COLORS.purple]: "#9333EA",
+  [COLORS.white]: "#FFFFFF",
 };
 
 export const COLOR_SEQUENCE = [
