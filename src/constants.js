@@ -6,6 +6,20 @@ export const COLORS = {
   white: "bg-white",
 };
 
+export const COLORS_HEX = {
+  lime: "#65A30D",
+  cyan: "#22D3EE",
+  rose: "#E11D48",
+  purple: "#9333EA",
+  white: "#FFFFFF",
+  black: "#000000",
+  "bg-lime-600": "#65A30D",
+  "bg-cyan-400": "#22D3EE",
+  "bg-rose-600": "#E11D48",
+  "bg-purple-600": "#9333EA",
+  "bg-white": "#FFFFFF",
+};
+
 export const COLOR_SEQUENCE = [
   COLORS.lime,
   COLORS.cyan,

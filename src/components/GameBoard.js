@@ -16,6 +16,8 @@ export function GameBoard({ startGameHandler }) {
     common: COLORS.white,
   };
 
+  const default_color = undefined;
+
   return (
     <>
       <div class="flex justify-center items-center min-h-screen bg-gray-100">
@@ -37,14 +39,26 @@ export function GameBoard({ startGameHandler }) {
         </div>
         <div class="grid grid-cols-15 gap-0">
           <div className="col-span-6 row-span-6">
-            <HomeBox color={corner_color_map.top_left} />
+            <HomeBox color={corner_color_map.top_left} homePieces={4} />
           </div>
 
-          <MoveBox color={corner_color_map[CORNER_INDICES[1]]} idx={1} />
-          <MoveBox color={corner_color_map[CORNER_INDICES[2]]} idx={2} />
-          <MoveBox color={corner_color_map[CORNER_INDICES[3]]} idx={3} />
+          <MoveBox
+            color={corner_color_map[CORNER_INDICES[1]]}
+            idx={1}
+            pieceColor={default_color}
+          />
+          <MoveBox
+            color={corner_color_map[CORNER_INDICES[2]]}
+            idx={2}
+            pieceColor={default_color}
+          />
+          <MoveBox
+            color={corner_color_map[CORNER_INDICES[3]]}
+            idx={3}
+            pieceColor={default_color}
+          />
           <div className="col-span-6 row-span-6">
-            <HomeBox color={corner_color_map.top_right} />
+            <HomeBox color={corner_color_map.top_right} homePieces={4} />
           </div>
 
           {Array(21)
@@ -54,6 +68,7 @@ export function GameBoard({ startGameHandler }) {
                 <MoveBox
                   color={corner_color_map[CORNER_INDICES[i + 4]]}
                   idx={i + 4}
+                  pieceColor={default_color}
                 />
               );
             })}
@@ -67,18 +82,31 @@ export function GameBoard({ startGameHandler }) {
                 <MoveBox
                   color={corner_color_map[CORNER_INDICES[i + 25]]}
                   idx={i + 25}
+                  pieceColor={default_color}
                 />
               );
             })}
 
           <div className="col-span-6 row-span-6">
-            <HomeBox color={corner_color_map.bottom_left} />
+            <HomeBox color={corner_color_map.bottom_left} homePieces={4} />
           </div>
-          <MoveBox color={corner_color_map[CORNER_INDICES[64]]} idx={64} />
-          <MoveBox color={corner_color_map[CORNER_INDICES[65]]} idx={65} />
-          <MoveBox color={corner_color_map[CORNER_INDICES[66]]} idx={66} />
+          <MoveBox
+            color={corner_color_map[CORNER_INDICES[64]]}
+            idx={64}
+            pieceColor={default_color}
+          />
+          <MoveBox
+            color={corner_color_map[CORNER_INDICES[65]]}
+            idx={65}
+            pieceColor={default_color}
+          />
+          <MoveBox
+            color={corner_color_map[CORNER_INDICES[66]]}
+            idx={66}
+            pieceColor={default_color}
+          />
           <div className="col-span-6 row-span-6">
-            <HomeBox color={corner_color_map.bottom_right} />
+            <HomeBox color={corner_color_map.bottom_right} homePieces={4} />
           </div>
 
           {Array(15)
@@ -88,6 +116,7 @@ export function GameBoard({ startGameHandler }) {
                 <MoveBox
                   color={corner_color_map[CORNER_INDICES[i + 67]]}
                   idx={i + 67}
+                  pieceColor={default_color}
                 />
               );
             })}
