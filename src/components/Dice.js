@@ -11,7 +11,7 @@ const diceFrontMap = {
   5: DiceFace5,
   6: DiceFace6,
 };
-export function Dice() {
+export function Dice({ onClickActionHandler }) {
   let [isShowing, setIsShowing] = useState(true);
   let [diceFront, setDiceFront] = useState(DiceFace1);
 
@@ -37,7 +37,9 @@ export function Dice() {
           setIsShowing(false);
           setTimeout(() => {
             setIsShowing(true);
-            setDiceFront(diceFrontMap[Math.floor(Math.random() * 6) + 1]);
+            let diceNumber = Math.floor(Math.random() * 6) + 1;
+            setDiceFront(diceFrontMap[diceNumber]);
+            onClickActionHandler(diceNumber);
           }, 500);
         }}
         className="mt-10 flex items-center gap-2 rounded-full bg-white/10 py-1 px-3 text-sm/6 font-semibold transition data-[hover]:scale-105 data-[hover]:bg-white/15"

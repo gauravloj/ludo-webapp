@@ -1,9 +1,6 @@
 import { COLORS, COLORS_HEX } from "../constants";
 
 export function PlayerPiece({ color, boxColor }) {
-  console.log("color", color);
-  console.log("boxColor", boxColor);
-
   return (
     <svg
       viewBox="0 0 24 24"

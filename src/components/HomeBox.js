@@ -5,7 +5,12 @@ function PieceHome({ color }) {
   return <button className={`rounded-full ${color} h-1/2 w-1/2`}></button>;
 }
 
-export function HomeBox({ color, homePieces }) {
+export function HomeBox({
+  color,
+  homePieces,
+  playerPieceInfo,
+  computerPieceInfo,
+}) {
   let blankHome = 4 - homePieces;
   return (
     <div

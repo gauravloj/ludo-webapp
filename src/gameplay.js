@@ -1,4 +1,20 @@
-class GamePlay {
+export function getLockedPiecesCount(playerPieceInfo) {
+  return Object.values(playerPieceInfo).filter((piece) => piece.location === -1)
+    .length;
+}
+export function isMovePossible(playerPieceInfo, rolledNumber) {
+  if (
+    getLockedPiecesCount(playerPieceInfo) == 4 &&
+    ![1, 6].includes(rolledNumber)
+  ) {
+    return false;
+  }
+  //Add other conditions
+  return true;
+}
+
+export function isMoveValid() {}
+/**
   movePiece(gameboard, player, piece, steps) {
     if (piece.position == position.homeSquare) {
       if (steps <= 6 - piece.index) piece.index += steps;
@@ -46,4 +62,4 @@ class GamePlay {
     // check all
     if (player.pieces.all == [position.homeSquare, 6]) return player.color;
   }
-}
+ */

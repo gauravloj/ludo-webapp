@@ -1,3 +1,11 @@
+/**
+ * Players pieces' locations tracking:
+ *      Locked or not
+ *      Is move valid?
+ *      Disable all invalid moves/dice rolls while this step is in progress.
+ *
+ */
+
 class Player {
   constructor() {
     this.color = "clear";
