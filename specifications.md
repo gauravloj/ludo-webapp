@@ -41,3 +41,9 @@ To gain end to end development experience of a website.
 ### Sequence Diagram
 
 <img src="assets/img/user-interaction-sequence-diagram.jpg" width="800" height="600" alt="Ludo Sequence Diagram">
+
+### Notes while implementation
+
+1. Ludo board only works on Chrome and Firefox currently. Safari and DuckDuckGo will be handled later.
+2. PLayer goes first.
+3. Even if there is only 1 move, player has to initiate it by clicking on the piece.
