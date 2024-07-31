@@ -13,6 +13,16 @@ export function isMovePossible(playerPieceInfo, rolledNumber) {
   return true;
 }
 
+export function getInitialPieceInfo(color) {
+  return {
+    1: { location: -1, isSelected: false },
+    2: { location: -1, isSelected: false },
+    3: { location: 2, isSelected: false },
+    4: { location: 2, isSelected: false },
+    color: color,
+  };
+}
+
 export function isMoveValid() {}
 /**
   movePiece(gameboard, player, piece, steps) {

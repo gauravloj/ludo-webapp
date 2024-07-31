@@ -6,13 +6,13 @@ export function PlayerPiece({ color, boxColor }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="#000000"
-      stroke-width="0.9359999999999999"
+      strokeWidth="0.9359999999999999"
     >
-      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g
         id="SVGRepo_tracerCarrier"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       ></g>
       <g id="SVGRepo_iconCarrier">
         <path

@@ -6,7 +6,11 @@ import { InfoBox } from "./InfoBox";
 import { COLORS, COLOR_SEQUENCE, CORNER_INDICES } from "../constants";
 import { Dice } from "./Dice";
 import { useState } from "react";
-import { getLockedPiecesCount, isMovePossible } from "../gameplay";
+import {
+  getInitialPieceInfo,
+  getLockedPiecesCount,
+  isMovePossible,
+} from "../gameplay";
 
 export function GameBoard({ startGameHandler }) {
   const [messages, setMessages] = useState([]);
@@ -21,25 +25,31 @@ export function GameBoard({ startGameHandler }) {
     top_left: COLOR_SEQUENCE[(player_color_index + 3) % 4],
     common: COLORS.white,
   };
-  const [playerPieceInfo, setPlayerPieceInfo] = useState({
-    1: { location: -1, isSelected: false },
-    2: { location: -1, isSelected: false },
-    3: { location: -1, isSelected: false },
-    4: { location: -1, isSelected: false },
-    color: player_color,
-  });
-  const [computerPieceInfo, setcomputerPieceInfo] = useState({
-    1: { location: -1, isSelected: false },
-    2: { location: -1, isSelected: false },
-    3: { location: -1, isSelected: false },
-    4: { location: -1, isSelected: false },
-    color: corner_color_map.top_right,
-  });
+  const all_players = {
+    // bottom left
+    player: getInitialPieceInfo(player_color),
+    // bottom right
+    minion_one: getInitialPieceInfo(
+      COLOR_SEQUENCE[(player_color_index + 1) % 4],
+    ),
+    // top right
+    nemesis: getInitialPieceInfo(COLOR_SEQUENCE[(player_color_index + 2) % 4]),
+    // top left
+    minion_too: getInitialPieceInfo(
+      COLOR_SEQUENCE[(player_color_index + 3) % 4],
+    ),
+  };
+  const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
+  const [computerPieceInfo, setcomputerPieceInfo] = useState(
+    all_players.nemesis,
+  );
+  console.log(playerPieceInfo, computerPieceInfo);
+  console.log(all_players);
   const default_color = undefined;
 
   return (
     <>
-      <div class="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="flex flex-col">
           <ActionButton
             text="Home"
@@ -56,39 +66,34 @@ export function GameBoard({ startGameHandler }) {
             }}
           />
         </div>
-        <div class="grid grid-cols-15 gap-0">
+        <div className="grid grid-cols-15 gap-0">
           <div className="col-span-6 row-span-6">
-            <HomeBox color={corner_color_map.top_left} homePieces={4} />
+            <HomeBox pieceInfo={all_players.minion_too} />
           </div>
 
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            color={corner_color_map[CORNER_INDICES[1]]}
+            boxColor={corner_color_map[CORNER_INDICES[1]]}
             idx={1}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            color={corner_color_map[CORNER_INDICES[2]]}
+            boxColor={corner_color_map[CORNER_INDICES[2]]}
             idx={2}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            color={corner_color_map[CORNER_INDICES[3]]}
+            boxColor={corner_color_map[CORNER_INDICES[3]]}
             idx={3}
             pieceColor={default_color}
           />
           <div className="col-span-6 row-span-6">
-            <HomeBox
-              playerPieceInfo={playerPieceInfo}
-              computerPieceInfo={computerPieceInfo}
-              color={corner_color_map.top_right}
-              homePieces={4}
-            />
+            <HomeBox pieceInfo={computerPieceInfo} />
           </div>
 
           {Array(21)
@@ -96,9 +101,10 @@ export function GameBoard({ startGameHandler }) {
             .map((option, i) => {
               return (
                 <MoveBox
+                  key={i}
                   playerPieceInfo={playerPieceInfo}
                   computerPieceInfo={computerPieceInfo}
-                  color={corner_color_map[CORNER_INDICES[i + 4]]}
+                  boxColor={corner_color_map[CORNER_INDICES[i + 4]]}
                   idx={i + 4}
                   pieceColor={default_color}
                 />
@@ -112,9 +118,10 @@ export function GameBoard({ startGameHandler }) {
             .map((option, i) => {
               return (
                 <MoveBox
+                  key={i}
                   playerPieceInfo={playerPieceInfo}
                   computerPieceInfo={computerPieceInfo}
-                  color={corner_color_map[CORNER_INDICES[i + 25]]}
+                  boxColor={corner_color_map[CORNER_INDICES[i + 25]]}
                   idx={i + 25}
                   pieceColor={default_color}
                 />
@@ -122,36 +129,31 @@ export function GameBoard({ startGameHandler }) {
             })}
 
           <div className="col-span-6 row-span-6">
-            <HomeBox
-              playerPieceInfo={playerPieceInfo}
-              computerPieceInfo={computerPieceInfo}
-              color={corner_color_map.bottom_left}
-              homePieces={getLockedPiecesCount(playerPieceInfo)}
-            />
+            <HomeBox pieceInfo={playerPieceInfo} />
           </div>
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            color={corner_color_map[CORNER_INDICES[64]]}
+            boxColor={corner_color_map[CORNER_INDICES[64]]}
             idx={64}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            color={corner_color_map[CORNER_INDICES[65]]}
+            boxColor={corner_color_map[CORNER_INDICES[65]]}
             idx={65}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            color={corner_color_map[CORNER_INDICES[66]]}
+            boxColor={corner_color_map[CORNER_INDICES[66]]}
             idx={66}
             pieceColor={default_color}
           />
           <div className="col-span-6 row-span-6">
-            <HomeBox color={corner_color_map.bottom_right} homePieces={4} />
+            <HomeBox pieceInfo={all_players.minion_one} />
           </div>
 
           {Array(15)
@@ -159,9 +161,10 @@ export function GameBoard({ startGameHandler }) {
             .map((option, i) => {
               return (
                 <MoveBox
+                  key={i}
                   playerPieceInfo={playerPieceInfo}
                   computerPieceInfo={computerPieceInfo}
-                  color={corner_color_map[CORNER_INDICES[i + 67]]}
+                  boxColor={corner_color_map[CORNER_INDICES[i + 67]]}
                   idx={i + 67}
                   pieceColor={default_color}
                 />
