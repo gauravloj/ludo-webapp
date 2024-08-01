@@ -6,7 +6,7 @@ function PieceHome({ color }) {
   return <button className={`rounded-full ${color} h-1/2 w-1/2`}></button>;
 }
 
-export function HomeBox({ pieceInfo }) {
+export function HomeBox({ pieceInfo, onClickHandler }) {
   return (
     <div
       className={`w-full h-full border-solid border-2 border-black ${pieceInfo.color} flex justify-center items-center`}
@@ -19,6 +19,9 @@ export function HomeBox({ pieceInfo }) {
               key={key}
               color={all_constants.COLORS_HEX[pieceInfo.color]}
               boxColor={all_constants.COLORS.white}
+              onClick={() => {
+                onClickHandler(key);
+              }}
             />
           ) : (
             <PieceHome key={key} color={pieceInfo.color} />

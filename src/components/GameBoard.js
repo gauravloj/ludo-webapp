@@ -8,8 +8,10 @@ import { Dice } from "./Dice";
 import { useState } from "react";
 import {
   getInitialPieceInfo,
-  getLockedPiecesCount,
+  isMoveValid,
   isMovePossible,
+  canUnlock,
+  updatePieceInfo,
 } from "../gameplay";
 
 export function GameBoard({ startGameHandler }) {
@@ -30,24 +32,25 @@ export function GameBoard({ startGameHandler }) {
     player: getInitialPieceInfo(player_color),
     // bottom right
     minion_one: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4]
+      all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4],
     ),
     // top right
     nemesis: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4]
+      all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4],
     ),
     // top left
     minion_too: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4]
+      all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
     ),
   };
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
-  const [computerPieceInfo, setcomputerPieceInfo] = useState(
-    all_players.nemesis
-  );
-  console.log(playerPieceInfo, computerPieceInfo);
+  const [nemesisPieceInfo, setnemesisPieceInfo] = useState(all_players.nemesis);
+  console.log(playerPieceInfo, nemesisPieceInfo);
   console.log(all_players);
   const default_color = undefined;
+  const homeBoxClickHandler = (pieceId, message) => {
+    console.log("Clicked piece id:", pieceId, message);
+  };
 
   return (
     <>
@@ -70,32 +73,42 @@ export function GameBoard({ startGameHandler }) {
         </div>
         <div className="grid grid-cols-15 gap-0">
           <div className="col-span-6 row-span-6">
-            <HomeBox pieceInfo={all_players.minion_too} />
+            <HomeBox
+              pieceInfo={all_players.minion_too}
+              onClickHandler={(key) => {
+                homeBoxClickHandler(key, "Clicked minion too");
+              }}
+            />
           </div>
 
           <MoveBox
             playerPieceInfo={playerPieceInfo}
-            computerPieceInfo={computerPieceInfo}
+            nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[1]]}
             idx={1}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
-            computerPieceInfo={computerPieceInfo}
+            nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[2]]}
             idx={2}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
-            computerPieceInfo={computerPieceInfo}
+            nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[3]]}
             idx={3}
             pieceColor={default_color}
           />
           <div className="col-span-6 row-span-6">
-            <HomeBox pieceInfo={computerPieceInfo} />
+            <HomeBox
+              pieceInfo={nemesisPieceInfo}
+              onClickHandler={(key) => {
+                homeBoxClickHandler(key, "Clicked nemesis");
+              }}
+            />
           </div>
 
           {Array(21)
@@ -105,7 +118,7 @@ export function GameBoard({ startGameHandler }) {
                 <MoveBox
                   key={i}
                   playerPieceInfo={playerPieceInfo}
-                  computerPieceInfo={computerPieceInfo}
+                  nemesisPieceInfo={nemesisPieceInfo}
                   boxColor={
                     corner_color_map[all_constants.CORNER_INDICES[i + 4]]
                   }
@@ -124,7 +137,7 @@ export function GameBoard({ startGameHandler }) {
                 <MoveBox
                   key={i}
                   playerPieceInfo={playerPieceInfo}
-                  computerPieceInfo={computerPieceInfo}
+                  nemesisPieceInfo={nemesisPieceInfo}
                   boxColor={
                     corner_color_map[all_constants.CORNER_INDICES[i + 25]]
                   }
@@ -135,31 +148,52 @@ export function GameBoard({ startGameHandler }) {
             })}
 
           <div className="col-span-6 row-span-6">
-            <HomeBox pieceInfo={playerPieceInfo} />
+            <HomeBox
+              pieceInfo={playerPieceInfo}
+              onClickHandler={(key) => {
+                homeBoxClickHandler(key, "Clicked player");
+                if (canUnlock(rolledNumber)) {
+                  let nextLocation = all_constants.START_BOXES.player;
+                  let newPieceInfo = updatePieceInfo(
+                    playerPieceInfo,
+                    key,
+                    "location",
+                    nextLocation,
+                  );
+                  setPlayerPieceInfo(newPieceInfo);
+                  console.log(playerPieceInfo);
+                }
+              }}
+            />
           </div>
           <MoveBox
             playerPieceInfo={playerPieceInfo}
-            computerPieceInfo={computerPieceInfo}
+            nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[64]]}
             idx={64}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
-            computerPieceInfo={computerPieceInfo}
+            nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[65]]}
             idx={65}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
-            computerPieceInfo={computerPieceInfo}
+            nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[66]]}
             idx={66}
             pieceColor={default_color}
           />
           <div className="col-span-6 row-span-6">
-            <HomeBox pieceInfo={all_players.minion_one} />
+            <HomeBox
+              pieceInfo={all_players.minion_one}
+              onClickHandler={(key) => {
+                homeBoxClickHandler(key, "Clicked minion one");
+              }}
+            />
           </div>
 
           {Array(15)
@@ -169,7 +203,7 @@ export function GameBoard({ startGameHandler }) {
                 <MoveBox
                   key={i}
                   playerPieceInfo={playerPieceInfo}
-                  computerPieceInfo={computerPieceInfo}
+                  nemesisPieceInfo={nemesisPieceInfo}
                   boxColor={
                     corner_color_map[all_constants.CORNER_INDICES[i + 67]]
                   }

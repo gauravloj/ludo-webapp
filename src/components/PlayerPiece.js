@@ -1,12 +1,13 @@
 import { all_constants } from "../constants";
 
-export function PlayerPiece({ color, boxColor }) {
+export function PlayerPiece({ color, boxColor, onClick }) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="#000000"
       strokeWidth="0.9359999999999999"
+      onClick={onClick}
     >
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g

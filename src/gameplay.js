@@ -23,7 +23,18 @@ export function getInitialPieceInfo(color) {
   };
 }
 
-export function isMoveValid() {}
+export function canUnlock(rolledNumber) {
+  if (rolledNumber === 1 || rolledNumber === 6) {
+    return true;
+  }
+  return false;
+}
+
+export function updatePieceInfo(pieceInfo, pieceIndex, keyName, newValue) {
+  let oldValue = JSON.parse(JSON.stringify(pieceInfo));
+  oldValue[pieceIndex][keyName] = newValue;
+  return oldValue;
+}
 /**
   movePiece(gameboard, player, piece, steps) {
     if (piece.position == position.homeSquare) {

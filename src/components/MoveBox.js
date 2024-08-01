@@ -6,7 +6,7 @@ export function MoveBox({
   idx,
   pieceColor,
   playerPieceInfo,
-  computerPieceInfo,
+  nemesisPieceInfo,
 }) {
   let to_rotate = -45;
   return (
@@ -18,7 +18,6 @@ export function MoveBox({
         let piece = playerPieceInfo[key];
         if (piece.location === idx) {
           to_rotate += 45;
-          console.log(to_rotate);
         }
         return piece.location === idx ? (
           <div className={`col-start-1 row-start-1 rotate-${to_rotate}`}>
@@ -31,17 +30,16 @@ export function MoveBox({
         ) : null;
       })}
 
-      {Object.keys(computerPieceInfo).map((key) => {
-        let piece = computerPieceInfo[key];
+      {Object.keys(nemesisPieceInfo).map((key) => {
+        let piece = nemesisPieceInfo[key];
         if (piece.location === idx) {
           to_rotate += 45;
-          console.log(to_rotate);
         }
         return piece.location === idx ? (
           <div className={`col-start-1 row-start-1 rotate-${to_rotate}`}>
             <PlayerPiece
               key={key}
-              color={all_constants.COLORS_HEX[computerPieceInfo.color]}
+              color={all_constants.COLORS_HEX[nemesisPieceInfo.color]}
               boxColor={boxColor}
             />
           </div>
