@@ -1,4 +1,4 @@
-import { COLORS, COLORS_HEX } from "../constants";
+import { all_constants } from "../constants";
 import { PlayerPiece } from "./PlayerPiece";
 
 export function MoveBox({
@@ -13,6 +13,7 @@ export function MoveBox({
     <div
       className={`grid grid-cols-1 w-8 h-8 border-solid border-2 border-black ${boxColor}`}
     >
+      {idx}
       {Object.keys(playerPieceInfo).map((key) => {
         let piece = playerPieceInfo[key];
         if (piece.location === idx) {
@@ -23,7 +24,7 @@ export function MoveBox({
           <div className={`col-start-1 row-start-1 rotate-${to_rotate}`}>
             <PlayerPiece
               key={key}
-              color={COLORS_HEX[playerPieceInfo.color]}
+              color={all_constants.COLORS_HEX[playerPieceInfo.color]}
               boxColor={boxColor}
             />
           </div>
@@ -40,7 +41,7 @@ export function MoveBox({
           <div className={`col-start-1 row-start-1 rotate-${to_rotate}`}>
             <PlayerPiece
               key={key}
-              color={COLORS_HEX[computerPieceInfo.color]}
+              color={all_constants.COLORS_HEX[computerPieceInfo.color]}
               boxColor={boxColor}
             />
           </div>

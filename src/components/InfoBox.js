@@ -4,7 +4,11 @@ export function InfoBox({ messages }) {
       <div className="text-3xl">Alerts / Current Play</div>
       <ol className="list-disc list-inside text-2xl">
         {messages.map((message) => {
-          return <div className="text-2xl">{message}</div>;
+          return (
+            <div key={message} className="text-2xl">
+              {message}
+            </div>
+          );
         })}
       </ol>
     </div>

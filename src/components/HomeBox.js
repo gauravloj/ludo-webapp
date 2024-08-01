@@ -1,4 +1,4 @@
-import { COLORS, COLORS_HEX } from "../constants";
+import { all_constants } from "../constants";
 import { getInitialPieceInfo } from "../gameplay";
 import { PlayerPiece } from "./PlayerPiece";
 
@@ -17,8 +17,8 @@ export function HomeBox({ pieceInfo }) {
           return piece.location === -1 ? (
             <PlayerPiece
               key={key}
-              color={COLORS_HEX[pieceInfo.color]}
-              boxColor={COLORS.white}
+              color={all_constants.COLORS_HEX[pieceInfo.color]}
+              boxColor={all_constants.COLORS.white}
             />
           ) : (
             <PieceHome key={key} color={pieceInfo.color} />

@@ -17,8 +17,8 @@ export function getInitialPieceInfo(color) {
   return {
     1: { location: -1, isSelected: false },
     2: { location: -1, isSelected: false },
-    3: { location: 2, isSelected: false },
-    4: { location: 2, isSelected: false },
+    3: { location: -1, isSelected: false },
+    4: { location: -1, isSelected: false },
     color: color,
   };
 }

@@ -3,7 +3,7 @@ import { HomeBox } from "./HomeBox";
 import { MoveBox } from "./MoveBox";
 import { WinningBox } from "./WinningBox";
 import { InfoBox } from "./InfoBox";
-import { COLORS, COLOR_SEQUENCE, CORNER_INDICES } from "../constants";
+import { all_constants } from "../constants";
 import { Dice } from "./Dice";
 import { useState } from "react";
 import {
@@ -17,31 +17,33 @@ export function GameBoard({ startGameHandler }) {
   const [rolledNumber, setRolledNumber] = useState(1);
 
   const player_color = localStorage.getItem("selectedColor");
-  const player_color_index = COLOR_SEQUENCE.indexOf(player_color);
+  const player_color_index = all_constants.COLOR_SEQUENCE.indexOf(player_color);
   const corner_color_map = {
     bottom_left: player_color,
-    bottom_right: COLOR_SEQUENCE[(player_color_index + 1) % 4],
-    top_right: COLOR_SEQUENCE[(player_color_index + 2) % 4],
-    top_left: COLOR_SEQUENCE[(player_color_index + 3) % 4],
-    common: COLORS.white,
+    bottom_right: all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4],
+    top_right: all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4],
+    top_left: all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
+    common: all_constants.COLORS.white,
   };
   const all_players = {
     // bottom left
     player: getInitialPieceInfo(player_color),
     // bottom right
     minion_one: getInitialPieceInfo(
-      COLOR_SEQUENCE[(player_color_index + 1) % 4],
+      all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4]
     ),
     // top right
-    nemesis: getInitialPieceInfo(COLOR_SEQUENCE[(player_color_index + 2) % 4]),
+    nemesis: getInitialPieceInfo(
+      all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4]
+    ),
     // top left
     minion_too: getInitialPieceInfo(
-      COLOR_SEQUENCE[(player_color_index + 3) % 4],
+      all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4]
     ),
   };
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [computerPieceInfo, setcomputerPieceInfo] = useState(
-    all_players.nemesis,
+    all_players.nemesis
   );
   console.log(playerPieceInfo, computerPieceInfo);
   console.log(all_players);
@@ -74,21 +76,21 @@ export function GameBoard({ startGameHandler }) {
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            boxColor={corner_color_map[CORNER_INDICES[1]]}
+            boxColor={corner_color_map[all_constants.CORNER_INDICES[1]]}
             idx={1}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            boxColor={corner_color_map[CORNER_INDICES[2]]}
+            boxColor={corner_color_map[all_constants.CORNER_INDICES[2]]}
             idx={2}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            boxColor={corner_color_map[CORNER_INDICES[3]]}
+            boxColor={corner_color_map[all_constants.CORNER_INDICES[3]]}
             idx={3}
             pieceColor={default_color}
           />
@@ -104,7 +106,9 @@ export function GameBoard({ startGameHandler }) {
                   key={i}
                   playerPieceInfo={playerPieceInfo}
                   computerPieceInfo={computerPieceInfo}
-                  boxColor={corner_color_map[CORNER_INDICES[i + 4]]}
+                  boxColor={
+                    corner_color_map[all_constants.CORNER_INDICES[i + 4]]
+                  }
                   idx={i + 4}
                   pieceColor={default_color}
                 />
@@ -121,7 +125,9 @@ export function GameBoard({ startGameHandler }) {
                   key={i}
                   playerPieceInfo={playerPieceInfo}
                   computerPieceInfo={computerPieceInfo}
-                  boxColor={corner_color_map[CORNER_INDICES[i + 25]]}
+                  boxColor={
+                    corner_color_map[all_constants.CORNER_INDICES[i + 25]]
+                  }
                   idx={i + 25}
                   pieceColor={default_color}
                 />
@@ -134,21 +140,21 @@ export function GameBoard({ startGameHandler }) {
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            boxColor={corner_color_map[CORNER_INDICES[64]]}
+            boxColor={corner_color_map[all_constants.CORNER_INDICES[64]]}
             idx={64}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            boxColor={corner_color_map[CORNER_INDICES[65]]}
+            boxColor={corner_color_map[all_constants.CORNER_INDICES[65]]}
             idx={65}
             pieceColor={default_color}
           />
           <MoveBox
             playerPieceInfo={playerPieceInfo}
             computerPieceInfo={computerPieceInfo}
-            boxColor={corner_color_map[CORNER_INDICES[66]]}
+            boxColor={corner_color_map[all_constants.CORNER_INDICES[66]]}
             idx={66}
             pieceColor={default_color}
           />
@@ -164,7 +170,9 @@ export function GameBoard({ startGameHandler }) {
                   key={i}
                   playerPieceInfo={playerPieceInfo}
                   computerPieceInfo={computerPieceInfo}
-                  boxColor={corner_color_map[CORNER_INDICES[i + 67]]}
+                  boxColor={
+                    corner_color_map[all_constants.CORNER_INDICES[i + 67]]
+                  }
                   idx={i + 67}
                   pieceColor={default_color}
                 />

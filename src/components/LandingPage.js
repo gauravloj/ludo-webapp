@@ -1,4 +1,4 @@
-import { COLORS } from "../constants";
+import { all_constants } from "../constants";
 
 export function LandingPage({ startGameHandler }) {
   let colorSelectionHandler = (color) => {
@@ -39,25 +39,25 @@ export function LandingPage({ startGameHandler }) {
             <button
               className="rounded-full bg-lime-600 h-20 w-20"
               onClick={() => {
-                colorSelectionHandler(COLORS.lime);
+                colorSelectionHandler(all_constants.COLORS.lime);
               }}
             ></button>
             <button
               className="rounded-full bg-cyan-400 h-20 w-20"
               onClick={() => {
-                colorSelectionHandler(COLORS.cyan);
+                colorSelectionHandler(all_constants.COLORS.cyan);
               }}
             ></button>
             <button
               className="rounded-full bg-purple-600 h-20 w-20"
               onClick={() => {
-                colorSelectionHandler(COLORS.purple);
+                colorSelectionHandler(all_constants.COLORS.purple);
               }}
             ></button>
             <button
               className="rounded-full bg-rose-600 h-20 w-20"
               onClick={() => {
-                colorSelectionHandler(COLORS.rose);
+                colorSelectionHandler(all_constants.COLORS.rose);
               }}
             ></button>
           </div>

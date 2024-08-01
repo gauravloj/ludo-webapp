@@ -1,4 +1,4 @@
-export const COLORS = {
+const COLORS = {
   lime: "bg-lime-600",
   cyan: "bg-cyan-400",
   rose: "bg-rose-600",
@@ -6,7 +6,7 @@ export const COLORS = {
   white: "bg-white",
 };
 
-export const COLORS_HEX = {
+const COLORS_HEX = {
   lime: "#65A30D",
   cyan: "#22D3EE",
   rose: "#E11D48",
@@ -20,14 +20,9 @@ export const COLORS_HEX = {
   [COLORS.white]: "#FFFFFF",
 };
 
-export const COLOR_SEQUENCE = [
-  COLORS.lime,
-  COLORS.cyan,
-  COLORS.rose,
-  COLORS.purple,
-];
+const COLOR_SEQUENCE = [COLORS.lime, COLORS.cyan, COLORS.rose, COLORS.purple];
 
-export const CORNER_INDICES = {
+const CORNER_INDICES = {
   1: "common",
   2: "common",
   3: "common",
@@ -103,4 +98,37 @@ export const CORNER_INDICES = {
   79: "common",
   80: "common",
   81: "common",
+};
+
+const START_BOXES = {
+  player: 76,
+  nemesis: 6,
+  minion_one: 20,
+  minion_too: 53,
+};
+const END_BOXES = {
+  player: 80,
+  nemesis: 2,
+  minion_one: 31,
+  minion_too: 42,
+};
+const REGULAR_PATH = [
+  76, 73, 70, 67, 64, 48, 47, 46, 45, 44, 43, 31, 19, 20, 21, 22, 23, 24, 16,
+  13, 10, 7, 4, 1, 2, 3, 6, 9, 12, 15, 18, 25, 26, 27, 28, 29, 30, 42, 54, 53,
+  52, 51, 50, 49, 66, 69, 72, 75, 78, 81, 80, 79,
+];
+const WINNING_PATH = {
+  player: [77, 74, 71, 68, 65],
+  nemesis: [5, 8, 11, 14, 17],
+};
+
+export const all_constants = {
+  COLORS,
+  COLORS_HEX,
+  COLOR_SEQUENCE,
+  CORNER_INDICES,
+  START_BOXES,
+  END_BOXES,
+  REGULAR_PATH,
+  WINNING_PATH,
 };
