@@ -100,17 +100,15 @@ const CORNER_INDICES = {
   81: "common",
 };
 
-const START_BOXES = {
-  player: 76,
-  nemesis: 6,
-  minion_one: 20,
-  minion_too: 53,
+const START_BOXES_INDICES = {
+  player: 0,
+  nemesis: 26,
+  minion_one: 13,
+  minion_too: 39,
 };
-const END_BOXES = {
-  player: 80,
-  nemesis: 2,
-  minion_one: 31,
-  minion_too: 42,
+const END_BOXES_INDICES = {
+  player: 50,
+  nemesis: 24,
 };
 const REGULAR_PATH = [
   76, 73, 70, 67, 64, 48, 47, 46, 45, 44, 43, 31, 19, 20, 21, 22, 23, 24, 16,
@@ -127,8 +125,8 @@ export const all_constants = {
   COLORS_HEX,
   COLOR_SEQUENCE,
   CORNER_INDICES,
-  START_BOXES,
-  END_BOXES,
+  START_BOXES_INDICES,
+  END_BOXES_INDICES,
   REGULAR_PATH,
   WINNING_PATH,
 };

@@ -1,3 +1,5 @@
+import { all_constants } from "./constants";
+
 export function getLockedPiecesCount(playerPieceInfo) {
   return Object.values(playerPieceInfo).filter((piece) => piece.location === -1)
     .length;
@@ -35,6 +37,25 @@ export function updatePieceInfo(pieceInfo, pieceIndex, keyName, newValue) {
   oldValue[pieceIndex][keyName] = newValue;
   return oldValue;
 }
+
+export function isMoveValid(pieceInfo, rolledNumber, pieceIndex) {
+  return true;
+}
+export function getNextLocation(pieceInfo, rolledNumber, isPlayer) {
+  let nextLocation = pieceInfo.location;
+  let moverIndex = isPlayer ? "player" : "nemesis";
+  console.log(all_constants.END_BOXES_INDICES);
+  if (
+    nextLocation + rolledNumber <=
+    all_constants.END_BOXES_INDICES[moverIndex]
+  ) {
+    nextLocation = nextLocation + rolledNumber;
+  } else {
+    nextLocation = all_constants.END_BOXES_INDICES[moverIndex]; // Update Logic later
+  }
+  return all_constants.REGULAR_PATH[nextLocation];
+}
+
 /**
   movePiece(gameboard, player, piece, steps) {
     if (piece.position == position.homeSquare) {

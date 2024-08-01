@@ -12,6 +12,7 @@ import {
   isMovePossible,
   canUnlock,
   updatePieceInfo,
+  getNextLocation,
 } from "../gameplay";
 
 export function GameBoard({ startGameHandler }) {
@@ -32,15 +33,15 @@ export function GameBoard({ startGameHandler }) {
     player: getInitialPieceInfo(player_color),
     // bottom right
     minion_one: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4],
+      all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4]
     ),
     // top right
     nemesis: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4],
+      all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4]
     ),
     // top left
     minion_too: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
+      all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4]
     ),
   };
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
@@ -82,6 +83,9 @@ export function GameBoard({ startGameHandler }) {
           </div>
 
           <MoveBox
+            onClickHandler={(key) => {
+              homeBoxClickHandler(key, "Clicked movebox");
+            }}
             playerPieceInfo={playerPieceInfo}
             nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[1]]}
@@ -89,6 +93,9 @@ export function GameBoard({ startGameHandler }) {
             pieceColor={default_color}
           />
           <MoveBox
+            onClickHandler={(key) => {
+              homeBoxClickHandler(key, "Clicked movebox");
+            }}
             playerPieceInfo={playerPieceInfo}
             nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[2]]}
@@ -96,6 +103,9 @@ export function GameBoard({ startGameHandler }) {
             pieceColor={default_color}
           />
           <MoveBox
+            onClickHandler={(key) => {
+              homeBoxClickHandler(key, "Clicked movebox");
+            }}
             playerPieceInfo={playerPieceInfo}
             nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[3]]}
@@ -116,6 +126,9 @@ export function GameBoard({ startGameHandler }) {
             .map((option, i) => {
               return (
                 <MoveBox
+                  onClickHandler={(key) => {
+                    homeBoxClickHandler(key, "Clicked movebox");
+                  }}
                   key={i}
                   playerPieceInfo={playerPieceInfo}
                   nemesisPieceInfo={nemesisPieceInfo}
@@ -135,6 +148,9 @@ export function GameBoard({ startGameHandler }) {
             .map((option, i) => {
               return (
                 <MoveBox
+                  onClickHandler={(key) => {
+                    homeBoxClickHandler(key, "Clicked movebox");
+                  }}
                   key={i}
                   playerPieceInfo={playerPieceInfo}
                   nemesisPieceInfo={nemesisPieceInfo}
@@ -153,12 +169,15 @@ export function GameBoard({ startGameHandler }) {
               onClickHandler={(key) => {
                 homeBoxClickHandler(key, "Clicked player");
                 if (canUnlock(rolledNumber)) {
-                  let nextLocation = all_constants.START_BOXES.player;
+                  let nextLocation =
+                    all_constants.REGULAR_PATH[
+                      all_constants.START_BOXES_INDICES.player
+                    ];
                   let newPieceInfo = updatePieceInfo(
                     playerPieceInfo,
                     key,
                     "location",
-                    nextLocation,
+                    nextLocation
                   );
                   setPlayerPieceInfo(newPieceInfo);
                   console.log(playerPieceInfo);
@@ -167,6 +186,9 @@ export function GameBoard({ startGameHandler }) {
             />
           </div>
           <MoveBox
+            onClickHandler={(key) => {
+              homeBoxClickHandler(key, "Clicked movebox");
+            }}
             playerPieceInfo={playerPieceInfo}
             nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[64]]}
@@ -174,6 +196,9 @@ export function GameBoard({ startGameHandler }) {
             pieceColor={default_color}
           />
           <MoveBox
+            onClickHandler={(key) => {
+              homeBoxClickHandler(key, "Clicked movebox");
+            }}
             playerPieceInfo={playerPieceInfo}
             nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[65]]}
@@ -181,6 +206,9 @@ export function GameBoard({ startGameHandler }) {
             pieceColor={default_color}
           />
           <MoveBox
+            onClickHandler={(key) => {
+              homeBoxClickHandler(key, "Clicked movebox");
+            }}
             playerPieceInfo={playerPieceInfo}
             nemesisPieceInfo={nemesisPieceInfo}
             boxColor={corner_color_map[all_constants.CORNER_INDICES[66]]}
@@ -201,6 +229,22 @@ export function GameBoard({ startGameHandler }) {
             .map((option, i) => {
               return (
                 <MoveBox
+                  onClickHandler={(key) => {
+                    homeBoxClickHandler(key, "Clicked movebox");
+                    let nextLocation = getNextLocation(
+                      playerPieceInfo[key],
+                      rolledNumber,
+                      true
+                    );
+                    let newPieceInfo = updatePieceInfo(
+                      playerPieceInfo,
+                      key,
+                      "location",
+                      nextLocation
+                    );
+                    setPlayerPieceInfo(newPieceInfo);
+                    console.log("Moved to next box", playerPieceInfo);
+                  }}
                   key={i}
                   playerPieceInfo={playerPieceInfo}
                   nemesisPieceInfo={nemesisPieceInfo}

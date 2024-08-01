@@ -7,6 +7,7 @@ export function MoveBox({
   pieceColor,
   playerPieceInfo,
   nemesisPieceInfo,
+  onClickHandler,
 }) {
   let to_rotate = -45;
   return (
@@ -25,6 +26,9 @@ export function MoveBox({
               key={key}
               color={all_constants.COLORS_HEX[playerPieceInfo.color]}
               boxColor={boxColor}
+              onClick={() => {
+                onClickHandler(key);
+              }}
             />
           </div>
         ) : null;
