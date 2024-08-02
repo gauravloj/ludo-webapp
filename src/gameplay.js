@@ -15,7 +15,12 @@ export function isMovePossible(playerPieceInfo, rolledNumber) {
   return true;
 }
 
-export function getInitialPieceInfo(color, startBoxIndex, endBoxIndex) {
+export function getInitialPieceInfo(
+  color,
+  startBoxIndex,
+  endBoxIndex,
+  winningPath,
+) {
   return {
     1: {
       location: -1,
@@ -23,6 +28,9 @@ export function getInitialPieceInfo(color, startBoxIndex, endBoxIndex) {
       isSelected: false,
       startBoxIndex: startBoxIndex,
       endBoxIndex: endBoxIndex,
+      isOnWinningPath: false,
+      winningPath: winningPath,
+      isCompleted: true,
     },
     2: {
       location: -1,
@@ -30,6 +38,9 @@ export function getInitialPieceInfo(color, startBoxIndex, endBoxIndex) {
       isSelected: false,
       startBoxIndex: startBoxIndex,
       endBoxIndex: endBoxIndex,
+      isOnWinningPath: false,
+      winningPath: winningPath,
+      isCompleted: true,
     },
     3: {
       location: -1,
@@ -37,6 +48,9 @@ export function getInitialPieceInfo(color, startBoxIndex, endBoxIndex) {
       isSelected: false,
       startBoxIndex: startBoxIndex,
       endBoxIndex: endBoxIndex,
+      isOnWinningPath: false,
+      winningPath: winningPath,
+      isCompleted: false,
     },
     4: {
       location: -1,
@@ -44,6 +58,9 @@ export function getInitialPieceInfo(color, startBoxIndex, endBoxIndex) {
       isSelected: false,
       startBoxIndex: startBoxIndex,
       endBoxIndex: endBoxIndex,
+      isOnWinningPath: false,
+      winningPath: winningPath,
+      isCompleted: true,
     },
     color: color,
   };
@@ -66,6 +83,13 @@ export function isMoveValid(pieceInfo, rolledNumber, pieceIndex) {
   return true;
 }
 export function getNextLocation(pieceInfo, rolledNumber) {
+  if (pieceInfo.isOnWinningPath) {
+    if (pieceInfo.boxIndex + rolledNumber > 6) {
+      return pieceInfo.boxIndex;
+    }
+    return pieceInfo.boxIndex + rolledNumber;
+  }
+
   let nextIndex = pieceInfo.boxIndex;
   if (
     nextIndex + rolledNumber - pieceInfo.startBoxIndex <=
@@ -73,9 +97,17 @@ export function getNextLocation(pieceInfo, rolledNumber) {
   ) {
     nextIndex = nextIndex + rolledNumber;
   } else {
-    nextIndex = all_constants.PLAYER_CONSTANTS.endBoxIndex;
+    nextIndex = nextIndex + rolledNumber - pieceInfo.endBoxIndex;
   }
   return nextIndex;
+}
+
+export function isOnWinningPath(pieceInfo, rolledNumber) {
+  return (
+    pieceInfo.isOnWinningPath ||
+    pieceInfo.boxIndex + rolledNumber - pieceInfo.startBoxIndex >
+      all_constants.PLAYER_CONSTANTS.endBoxIndex
+  );
 }
 
 /**

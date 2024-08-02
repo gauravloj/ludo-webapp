@@ -1,7 +1,7 @@
 import { ActionButton } from "./Button";
 import { HomeBox } from "./HomeBox";
 import { MoveBox } from "./MoveBox";
-import { WinningBox } from "./WinningBox";
+import { FinalDestination } from "./WinningBox";
 import { InfoBox } from "./InfoBox";
 import { all_constants } from "../constants";
 import { Dice } from "./Dice";
@@ -13,6 +13,7 @@ import {
   canUnlock,
   updatePieceInfo,
   getNextLocation,
+  isOnWinningPath,
 } from "../gameplay";
 
 export function GameBoard({ startGameHandler }) {
@@ -34,28 +35,32 @@ export function GameBoard({ startGameHandler }) {
       player_color,
       all_constants.PLAYER_CONSTANTS.startBoxIndex,
       all_constants.PLAYER_CONSTANTS.endBoxIndex,
+      all_constants.PLAYER_CONSTANTS.winningPath,
     ),
     // bottom right
     minion_one: getInitialPieceInfo(
       all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4],
       all_constants.MINION_ONE_CONSTANTS.startBoxIndex,
       all_constants.MINION_ONE_CONSTANTS.endBoxIndex,
+      all_constants.MINION_ONE_CONSTANTS.winningPath,
     ),
     // top right
     nemesis: getInitialPieceInfo(
       all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4],
       all_constants.NEMESIS_CONSTANTS.startBoxIndex,
       all_constants.NEMESIS_CONSTANTS.endBoxIndex,
+      all_constants.NEMESIS_CONSTANTS.winningPath,
     ),
     // top left
     minion_too: getInitialPieceInfo(
       all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
       all_constants.MINION_TOO_CONSTANTS.startBoxIndex,
       all_constants.MINION_TOO_CONSTANTS.endBoxIndex,
+      all_constants.MINION_TOO_CONSTANTS.winningPath,
     ),
   };
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
-  const [nemesisPieceInfo, setnemesisPieceInfo] = useState(all_players.nemesis);
+  const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const default_color = undefined;
   const homeBoxClickHandler = (pieceId, message) => {
     console.log("Clicked piece id:", pieceId, message);
@@ -63,19 +68,38 @@ export function GameBoard({ startGameHandler }) {
 
   const moveBoxClickHandler = (key) => {
     homeBoxClickHandler(key, "Clicked movebox");
-    let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
-    let newPieceInfo = updatePieceInfo(
-      playerPieceInfo,
-      key,
-      "boxIndex",
-      nextIndex,
-    );
-    newPieceInfo = updatePieceInfo(
-      newPieceInfo,
-      key,
-      "location",
-      all_constants.REGULAR_PATH[nextIndex],
-    );
+    let isWinningPath = isOnWinningPath(playerPieceInfo[key], rolledNumber);
+    let newPieceInfo;
+    if (isWinningPath) {
+      let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
+      newPieceInfo = updatePieceInfo(
+        playerPieceInfo,
+        key,
+        "isOnWinningPath",
+        true,
+      );
+      newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
+      newPieceInfo = updatePieceInfo(
+        newPieceInfo,
+        key,
+        "location",
+        playerPieceInfo[key].winningPath[nextIndex],
+      );
+    } else {
+      let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
+      newPieceInfo = updatePieceInfo(
+        playerPieceInfo,
+        key,
+        "boxIndex",
+        nextIndex,
+      );
+      newPieceInfo = updatePieceInfo(
+        newPieceInfo,
+        key,
+        "location",
+        all_constants.REGULAR_PATH[nextIndex],
+      );
+    }
     setPlayerPieceInfo(newPieceInfo);
     console.log("Moved to next box", playerPieceInfo);
   };
@@ -160,7 +184,10 @@ export function GameBoard({ startGameHandler }) {
               );
             })}
           <div className="col-span-3 row-span-3">
-            <WinningBox color={corner_color_map.top_right} />
+            <FinalDestination
+              playerPieces={playerPieceInfo}
+              nemesisPieces={nemesisPieceInfo}
+            />
           </div>
           {Array(30)
             .fill(1)
