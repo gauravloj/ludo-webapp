@@ -15,12 +15,36 @@ export function isMovePossible(playerPieceInfo, rolledNumber) {
   return true;
 }
 
-export function getInitialPieceInfo(color) {
+export function getInitialPieceInfo(color, startBoxIndex, endBoxIndex) {
   return {
-    1: { location: -1, isSelected: false },
-    2: { location: -1, isSelected: false },
-    3: { location: -1, isSelected: false },
-    4: { location: -1, isSelected: false },
+    1: {
+      location: -1,
+      boxIndex: -1,
+      isSelected: false,
+      startBoxIndex: startBoxIndex,
+      endBoxIndex: endBoxIndex,
+    },
+    2: {
+      location: -1,
+      boxIndex: -1,
+      isSelected: false,
+      startBoxIndex: startBoxIndex,
+      endBoxIndex: endBoxIndex,
+    },
+    3: {
+      location: -1,
+      boxIndex: -1,
+      isSelected: false,
+      startBoxIndex: startBoxIndex,
+      endBoxIndex: endBoxIndex,
+    },
+    4: {
+      location: -1,
+      boxIndex: -1,
+      isSelected: false,
+      startBoxIndex: startBoxIndex,
+      endBoxIndex: endBoxIndex,
+    },
     color: color,
   };
 }
@@ -41,42 +65,20 @@ export function updatePieceInfo(pieceInfo, pieceIndex, keyName, newValue) {
 export function isMoveValid(pieceInfo, rolledNumber, pieceIndex) {
   return true;
 }
-export function getNextLocation(pieceInfo, rolledNumber, isPlayer) {
-  let nextLocation = pieceInfo.location;
-  let moverIndex = isPlayer ? "player" : "nemesis";
-  console.log(all_constants.END_BOXES_INDICES);
+export function getNextLocation(pieceInfo, rolledNumber) {
+  let nextIndex = pieceInfo.boxIndex;
   if (
-    nextLocation + rolledNumber <=
-    all_constants.END_BOXES_INDICES[moverIndex]
+    nextIndex + rolledNumber - pieceInfo.startBoxIndex <=
+    all_constants.END_BOXES_INDICES["player"]
   ) {
-    nextLocation = nextLocation + rolledNumber;
+    nextIndex = nextIndex + rolledNumber;
   } else {
-    nextLocation = all_constants.END_BOXES_INDICES[moverIndex]; // Update Logic later
+    nextIndex = all_constants.END_BOXES_INDICES["player"]; // Update Logic later
   }
-  return all_constants.REGULAR_PATH[nextLocation];
+  return nextIndex;
 }
 
 /**
-  movePiece(gameboard, player, piece, steps) {
-    if (piece.position == position.homeSquare) {
-      if (steps <= 6 - piece.index) piece.index += steps;
-      else return "Invalid move";
-    } else {
-      if (piece.index == -1) return "Invalid move. Need a 6 to start";
-      if (piece.index <= gameboard.endBoxes[player.color]) {
-        piece.index += steps;
-        this.checkForCollision(piece);
-      } else {
-        piece.position = position.homeSquare;
-        piece.index = steps - (gameboard.endBoxes[player.color] - piece.index);
-      }
-    }
-
-    // move the piece
-    // check for collision
-    // check for win
-  }
-
   checkForCollision(player, players, index) {
     var count = 0;
     var pieces = [];
@@ -96,12 +98,4 @@ export function getNextLocation(pieceInfo, rolledNumber, isPlayer) {
     // check if the piece will land on another piece
   }
 
-  moveOut(gameboard, player, piece) {
-    piece.index = gameboard.startBoxes[player.color];
-  }
-
-  checkForWin(player) {
-    // check all
-    if (player.pieces.all == [position.homeSquare, 6]) return player.color;
-  }
  */

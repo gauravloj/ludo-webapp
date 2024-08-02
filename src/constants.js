@@ -109,6 +109,8 @@ const START_BOXES_INDICES = {
 const END_BOXES_INDICES = {
   player: 50,
   nemesis: 24,
+  minion_one: 11,
+  minion_too: 37,
 };
 const REGULAR_PATH = [
   76, 73, 70, 67, 64, 48, 47, 46, 45, 44, 43, 31, 19, 20, 21, 22, 23, 24, 16,
