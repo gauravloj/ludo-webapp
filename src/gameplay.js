@@ -69,11 +69,11 @@ export function getNextLocation(pieceInfo, rolledNumber) {
   let nextIndex = pieceInfo.boxIndex;
   if (
     nextIndex + rolledNumber - pieceInfo.startBoxIndex <=
-    all_constants.END_BOXES_INDICES["player"]
+    all_constants.PLAYER_CONSTANTS.endBoxIndex
   ) {
     nextIndex = nextIndex + rolledNumber;
   } else {
-    nextIndex = all_constants.END_BOXES_INDICES["player"]; // Update Logic later
+    nextIndex = all_constants.PLAYER_CONSTANTS.endBoxIndex;
   }
   return nextIndex;
 }

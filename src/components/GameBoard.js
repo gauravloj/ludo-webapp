@@ -32,26 +32,26 @@ export function GameBoard({ startGameHandler }) {
     // bottom left
     player: getInitialPieceInfo(
       player_color,
-      all_constants.START_BOXES_INDICES.player,
-      all_constants.END_BOXES_INDICES.player,
+      all_constants.PLAYER_CONSTANTS.startBoxIndex,
+      all_constants.PLAYER_CONSTANTS.endBoxIndex,
     ),
     // bottom right
     minion_one: getInitialPieceInfo(
       all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4],
-      all_constants.START_BOXES_INDICES.minion_one,
-      all_constants.END_BOXES_INDICES.minion_one,
+      all_constants.MINION_ONE_CONSTANTS.startBoxIndex,
+      all_constants.MINION_ONE_CONSTANTS.endBoxIndex,
     ),
     // top right
     nemesis: getInitialPieceInfo(
       all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4],
-      all_constants.START_BOXES_INDICES.nemesis,
-      all_constants.END_BOXES_INDICES.nemesis,
+      all_constants.NEMESIS_CONSTANTS.startBoxIndex,
+      all_constants.NEMESIS_CONSTANTS.endBoxIndex,
     ),
     // top left
     minion_too: getInitialPieceInfo(
       all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
-      all_constants.START_BOXES_INDICES.minion_too,
-      all_constants.END_BOXES_INDICES.minion_too,
+      all_constants.MINION_TOO_CONSTANTS.startBoxIndex,
+      all_constants.MINION_TOO_CONSTANTS.endBoxIndex,
     ),
   };
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);

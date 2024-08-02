@@ -100,35 +100,44 @@ const CORNER_INDICES = {
   81: "common",
 };
 
-const START_BOXES_INDICES = {
-  player: 0,
-  nemesis: 26,
-  minion_one: 13,
-  minion_too: 39,
+const PLAYER_CONSTANTS = {
+  startBoxIndex: 0,
+  endBoxIndex: 50,
+  winningPath: [77, 74, 71, 68, 65],
 };
-const END_BOXES_INDICES = {
-  player: 50,
-  nemesis: 24,
-  minion_one: 11,
-  minion_too: 37,
+
+const NEMESIS_CONSTANTS = {
+  startBoxIndex: 26,
+  endBoxIndex: 24,
+  winningPath: [5, 8, 11, 14, 17],
 };
+
+const MINION_ONE_CONSTANTS = {
+  startBoxIndex: 13,
+  endBoxIndex: 11,
+  winningPath: [32, 33, 34, 35, 36],
+};
+
+const MINION_TOO_CONSTANTS = {
+  startBoxIndex: 39,
+  endBoxIndex: 37,
+  winningPath: [41, 40, 39, 38, 37],
+};
+
 const REGULAR_PATH = [
   76, 73, 70, 67, 64, 48, 47, 46, 45, 44, 43, 31, 19, 20, 21, 22, 23, 24, 16,
   13, 10, 7, 4, 1, 2, 3, 6, 9, 12, 15, 18, 25, 26, 27, 28, 29, 30, 42, 54, 53,
   52, 51, 50, 49, 66, 69, 72, 75, 78, 81, 80, 79,
 ];
-const WINNING_PATH = {
-  player: [77, 74, 71, 68, 65],
-  nemesis: [5, 8, 11, 14, 17],
-};
 
 export const all_constants = {
   COLORS,
   COLORS_HEX,
   COLOR_SEQUENCE,
   CORNER_INDICES,
-  START_BOXES_INDICES,
-  END_BOXES_INDICES,
   REGULAR_PATH,
-  WINNING_PATH,
+  PLAYER_CONSTANTS,
+  NEMESIS_CONSTANTS,
+  MINION_ONE_CONSTANTS,
+  MINION_TOO_CONSTANTS,
 };
