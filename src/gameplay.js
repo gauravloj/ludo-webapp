@@ -30,7 +30,7 @@ export function getInitialPieceInfo(
       endBoxIndex: endBoxIndex,
       isOnWinningPath: false,
       winningPath: winningPath,
-      isCompleted: true,
+      isCompleted: false,
     },
     2: {
       location: -1,
@@ -40,7 +40,7 @@ export function getInitialPieceInfo(
       endBoxIndex: endBoxIndex,
       isOnWinningPath: false,
       winningPath: winningPath,
-      isCompleted: true,
+      isCompleted: false,
     },
     3: {
       location: -1,
@@ -60,7 +60,7 @@ export function getInitialPieceInfo(
       endBoxIndex: endBoxIndex,
       isOnWinningPath: false,
       winningPath: winningPath,
-      isCompleted: true,
+      isCompleted: false,
     },
     color: color,
   };

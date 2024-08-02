@@ -1,7 +1,7 @@
 import { ActionButton } from "./Button";
 import { HomeBox } from "./HomeBox";
 import { MoveBox } from "./MoveBox";
-import { FinalDestination } from "./WinningBox";
+import { FinalDestination } from "./FinalDestination";
 import { InfoBox } from "./InfoBox";
 import { all_constants } from "../constants";
 import { Dice } from "./Dice";
