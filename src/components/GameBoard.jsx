@@ -54,7 +54,7 @@ export function GameBoard({ startGameHandler }) {
     top_left: all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
     common: all_constants.COLORS.white,
   };
-  const all_players = helperFunction.initializeAllPlayers();
+  const all_players = helperFunction.initializeAllPlayers(player_color);
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const default_color = undefined;
@@ -71,14 +71,14 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "isOnWinningPath",
-        true,
+        true
       );
       newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
       newPieceInfo = updatePieceInfo(
         newPieceInfo,
         key,
         "location",
-        playerPieceInfo[key].winningPath[nextIndex],
+        playerPieceInfo[key].winningPath[nextIndex]
       );
     } else {
       let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
@@ -86,13 +86,13 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "boxIndex",
-        nextIndex,
+        nextIndex
       );
       newPieceInfo = updatePieceInfo(
         newPieceInfo,
         key,
         "location",
-        all_constants.REGULAR_PATH[nextIndex],
+        all_constants.REGULAR_PATH[nextIndex]
       );
     }
     setPlayerPieceInfo(newPieceInfo);
@@ -217,13 +217,13 @@ export function GameBoard({ startGameHandler }) {
                     playerPieceInfo,
                     key,
                     "boxIndex",
-                    nextIndex,
+                    nextIndex
                   );
                   newPieceInfo = updatePieceInfo(
                     newPieceInfo,
                     key,
                     "location",
-                    all_constants.REGULAR_PATH[nextIndex],
+                    all_constants.REGULAR_PATH[nextIndex]
                   );
                   setPlayerPieceInfo(newPieceInfo);
                   setMessages(["Unlocked piece", `Computer rolls next`]);
