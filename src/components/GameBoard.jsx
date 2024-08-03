@@ -6,6 +6,8 @@ import { InfoBox } from "./InfoBox";
 import { all_constants } from "../constants";
 import { Dice } from "./Dice";
 import { useState } from "react";
+import { useReducer } from "react";
+
 import {
   getInitialPieceInfo,
   isMoveValid,
@@ -15,11 +17,34 @@ import {
   getNextLocation,
   isOnWinningPath,
 } from "../gameplay";
+import { playNemesis } from "../playerAI";
+import { helperFunction } from "../helper";
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "DiceRolled": {
+      console.log("In Reducer with case DiceRolled", state);
+      return "pendingPieceSelection";
+    }
+    case "PieceSelected": {
+      console.log("In Reducer with case PieceSelected", state);
+      if (action.diceNumber == 6) {
+        return "pendingDiceRoll";
+      }
+      return "pendingNemesisTurn";
+    }
+    case "NemesisPlayed": {
+      console.log("In Reducer with case NemesisPlayed", state);
+      return "pendingDiceRoll";
+    }
+  }
+  throw Error("Unknown action: " + action);
+}
 
 export function GameBoard({ startGameHandler }) {
   const [messages, setMessages] = useState([]);
   const [rolledNumber, setRolledNumber] = useState(1);
-
+  const [currentUserState, dispatch] = useReducer(reducer, "pendingDiceRoll");
   const player_color = localStorage.getItem("selectedColor");
   const player_color_index = all_constants.COLOR_SEQUENCE.indexOf(player_color);
   const corner_color_map = {
@@ -29,36 +54,7 @@ export function GameBoard({ startGameHandler }) {
     top_left: all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
     common: all_constants.COLORS.white,
   };
-  const all_players = {
-    // bottom left
-    player: getInitialPieceInfo(
-      player_color,
-      all_constants.PLAYER_CONSTANTS.startBoxIndex,
-      all_constants.PLAYER_CONSTANTS.endBoxIndex,
-      all_constants.PLAYER_CONSTANTS.winningPath,
-    ),
-    // bottom right
-    minion_one: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 1) % 4],
-      all_constants.MINION_ONE_CONSTANTS.startBoxIndex,
-      all_constants.MINION_ONE_CONSTANTS.endBoxIndex,
-      all_constants.MINION_ONE_CONSTANTS.winningPath,
-    ),
-    // top right
-    nemesis: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 2) % 4],
-      all_constants.NEMESIS_CONSTANTS.startBoxIndex,
-      all_constants.NEMESIS_CONSTANTS.endBoxIndex,
-      all_constants.NEMESIS_CONSTANTS.winningPath,
-    ),
-    // top left
-    minion_too: getInitialPieceInfo(
-      all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
-      all_constants.MINION_TOO_CONSTANTS.startBoxIndex,
-      all_constants.MINION_TOO_CONSTANTS.endBoxIndex,
-      all_constants.MINION_TOO_CONSTANTS.winningPath,
-    ),
-  };
+  const all_players = helperFunction.initializeAllPlayers();
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const default_color = undefined;
@@ -67,7 +63,6 @@ export function GameBoard({ startGameHandler }) {
   };
 
   const moveBoxClickHandler = (key) => {
-    homeBoxClickHandler(key, "Clicked movebox");
     let isWinningPath = isOnWinningPath(playerPieceInfo[key], rolledNumber);
     let newPieceInfo;
     if (isWinningPath) {
@@ -126,6 +121,7 @@ export function GameBoard({ startGameHandler }) {
         <div className="grid grid-cols-15 gap-0">
           <div className="col-span-6 row-span-6">
             <HomeBox
+              isPieceEnabled={false}
               pieceInfo={all_players.minion_too}
               onClickHandler={(key) => {
                 homeBoxClickHandler(key, "Clicked minion too");
@@ -159,6 +155,7 @@ export function GameBoard({ startGameHandler }) {
           />
           <div className="col-span-6 row-span-6">
             <HomeBox
+              isPieceEnabled={false}
               pieceInfo={nemesisPieceInfo}
               onClickHandler={(key) => {
                 homeBoxClickHandler(key, "Clicked nemesis");
@@ -209,6 +206,7 @@ export function GameBoard({ startGameHandler }) {
 
           <div className="col-span-6 row-span-6">
             <HomeBox
+              isPieceEnabled={currentUserState == "pendingPieceSelection"}
               pieceInfo={playerPieceInfo}
               onClickHandler={(key) => {
                 homeBoxClickHandler(key, "Clicked player");
@@ -228,6 +226,14 @@ export function GameBoard({ startGameHandler }) {
                     all_constants.REGULAR_PATH[nextIndex],
                   );
                   setPlayerPieceInfo(newPieceInfo);
+                  setMessages(["Unlocked piece", `Computer rolls next`]);
+                  dispatch({
+                    type: "PieceSelected",
+                    diceNumber: rolledNumber,
+                  });
+                  if (currentUserState == "pendingNemesisTurn") {
+                    playNemesis(dispatch);
+                  }
                 }
               }}
             />
@@ -258,6 +264,7 @@ export function GameBoard({ startGameHandler }) {
           />
           <div className="col-span-6 row-span-6">
             <HomeBox
+              isPieceEnabled={false}
               pieceInfo={all_players.minion_one}
               onClickHandler={(key) => {
                 homeBoxClickHandler(key, "Clicked minion one");
@@ -286,13 +293,19 @@ export function GameBoard({ startGameHandler }) {
         <div>
           <InfoBox messages={messages} />
           <Dice
+            isEnabled={currentUserState == "pendingDiceRoll"}
             onClickActionHandler={(diceNumber) => {
               setRolledNumber(diceNumber);
               let canMove = isMovePossible(playerPieceInfo, diceNumber);
               if (canMove) {
                 setMessages([`Select a piece to move`]);
+                dispatch({ type: "DiceRolled", diceNumber: diceNumber });
               } else {
-                setMessages(["No valid moves available", `Computer rolls`]);
+                setMessages([
+                  "No valid moves available",
+                  `Computer rolls next`,
+                ]);
+                dispatch({ type: "PieceSelected", diceNumber: diceNumber });
               }
             }}
           />

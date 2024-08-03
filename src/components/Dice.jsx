@@ -11,7 +11,7 @@ const diceFrontMap = {
   5: DiceFace5,
   6: DiceFace6,
 };
-export function Dice({ onClickActionHandler }) {
+export function Dice({ isEnabled, onClickActionHandler }) {
   let [isShowing, setIsShowing] = useState(true);
   let [diceFront, setDiceFront] = useState(DiceFace1);
 
@@ -33,6 +33,8 @@ export function Dice({ onClickActionHandler }) {
       </div>
 
       <Button
+        id="diceButtonId"
+        disabled={!isEnabled}
         onClick={() => {
           setIsShowing(false);
           setTimeout(() => {

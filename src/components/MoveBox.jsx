@@ -20,18 +20,22 @@ export function MoveBox({
         if (piece.location === idx) {
           to_rotate += 45;
         }
-        return piece.location === idx ? (
-          <div className={`col-start-1 row-start-1 rotate-${to_rotate}`}>
-            <PlayerPiece
+        return (
+          piece.location === idx && (
+            <div
+              className={`col-start-1 row-start-1 rotate-${to_rotate}`}
               key={key}
-              color={all_constants.COLORS_HEX[playerPieceInfo.color]}
-              boxColor={boxColor}
-              onClick={() => {
-                onClickHandler(key);
-              }}
-            />
-          </div>
-        ) : null;
+            >
+              <PlayerPiece
+                color={all_constants.COLORS_HEX[playerPieceInfo.color]}
+                boxColor={boxColor}
+                onClick={() => {
+                  onClickHandler(key);
+                }}
+              />
+            </div>
+          )
+        );
       })}
 
       {Object.keys(nemesisPieceInfo).map((key) => {
@@ -39,15 +43,19 @@ export function MoveBox({
         if (piece.location === idx) {
           to_rotate += 45;
         }
-        return piece.location === idx ? (
-          <div className={`col-start-1 row-start-1 rotate-${to_rotate}`}>
-            <PlayerPiece
+        return (
+          piece.location === idx && (
+            <div
+              className={`col-start-1 row-start-1 rotate-${to_rotate}`}
               key={key}
-              color={all_constants.COLORS_HEX[nemesisPieceInfo.color]}
-              boxColor={boxColor}
-            />
-          </div>
-        ) : null;
+            >
+              <PlayerPiece
+                color={all_constants.COLORS_HEX[nemesisPieceInfo.color]}
+                boxColor={boxColor}
+              />
+            </div>
+          )
+        );
       })}
 
       {/*<div >
