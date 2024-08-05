@@ -71,14 +71,14 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "isOnWinningPath",
-        true
+        true,
       );
       newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
       newPieceInfo = updatePieceInfo(
         newPieceInfo,
         key,
         "location",
-        playerPieceInfo[key].winningPath[nextIndex]
+        playerPieceInfo[key].winningPath[nextIndex],
       );
     } else {
       let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
@@ -86,17 +86,31 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "boxIndex",
-        nextIndex
+        nextIndex,
       );
       newPieceInfo = updatePieceInfo(
         newPieceInfo,
         key,
         "location",
-        all_constants.REGULAR_PATH[nextIndex]
+        all_constants.REGULAR_PATH[nextIndex],
       );
     }
     setPlayerPieceInfo(newPieceInfo);
     console.log("Moved to next box", playerPieceInfo);
+  };
+
+  const getMoveBox = (idx) => {
+    return (
+      <MoveBox
+        key={idx}
+        onClickHandler={moveBoxClickHandler}
+        playerPieceInfo={playerPieceInfo}
+        nemesisPieceInfo={nemesisPieceInfo}
+        boxColor={corner_color_map[all_constants.CORNER_INDICES[idx]]}
+        idx={idx}
+        pieceColor={default_color}
+      />
+    );
   };
 
   return (
@@ -129,30 +143,9 @@ export function GameBoard({ startGameHandler }) {
             />
           </div>
 
-          <MoveBox
-            onClickHandler={moveBoxClickHandler}
-            playerPieceInfo={playerPieceInfo}
-            nemesisPieceInfo={nemesisPieceInfo}
-            boxColor={corner_color_map[all_constants.CORNER_INDICES[1]]}
-            idx={1}
-            pieceColor={default_color}
-          />
-          <MoveBox
-            onClickHandler={moveBoxClickHandler}
-            playerPieceInfo={playerPieceInfo}
-            nemesisPieceInfo={nemesisPieceInfo}
-            boxColor={corner_color_map[all_constants.CORNER_INDICES[2]]}
-            idx={2}
-            pieceColor={default_color}
-          />
-          <MoveBox
-            onClickHandler={moveBoxClickHandler}
-            playerPieceInfo={playerPieceInfo}
-            nemesisPieceInfo={nemesisPieceInfo}
-            boxColor={corner_color_map[all_constants.CORNER_INDICES[3]]}
-            idx={3}
-            pieceColor={default_color}
-          />
+          {getMoveBox(1)}
+          {getMoveBox(2)}
+          {getMoveBox(3)}
           <div className="col-span-6 row-span-6">
             <HomeBox
               isPieceEnabled={false}
@@ -166,19 +159,7 @@ export function GameBoard({ startGameHandler }) {
           {Array(21)
             .fill(1)
             .map((option, i) => {
-              return (
-                <MoveBox
-                  onClickHandler={moveBoxClickHandler}
-                  key={i}
-                  playerPieceInfo={playerPieceInfo}
-                  nemesisPieceInfo={nemesisPieceInfo}
-                  boxColor={
-                    corner_color_map[all_constants.CORNER_INDICES[i + 4]]
-                  }
-                  idx={i + 4}
-                  pieceColor={default_color}
-                />
-              );
+              return getMoveBox(i + 4);
             })}
           <div className="col-span-3 row-span-3">
             <FinalDestination
@@ -189,19 +170,7 @@ export function GameBoard({ startGameHandler }) {
           {Array(30)
             .fill(1)
             .map((option, i) => {
-              return (
-                <MoveBox
-                  onClickHandler={moveBoxClickHandler}
-                  key={i}
-                  playerPieceInfo={playerPieceInfo}
-                  nemesisPieceInfo={nemesisPieceInfo}
-                  boxColor={
-                    corner_color_map[all_constants.CORNER_INDICES[i + 25]]
-                  }
-                  idx={i + 25}
-                  pieceColor={default_color}
-                />
-              );
+              return getMoveBox(i + 25);
             })}
 
           <div className="col-span-6 row-span-6">
@@ -217,13 +186,13 @@ export function GameBoard({ startGameHandler }) {
                     playerPieceInfo,
                     key,
                     "boxIndex",
-                    nextIndex
+                    nextIndex,
                   );
                   newPieceInfo = updatePieceInfo(
                     newPieceInfo,
                     key,
                     "location",
-                    all_constants.REGULAR_PATH[nextIndex]
+                    all_constants.REGULAR_PATH[nextIndex],
                   );
                   setPlayerPieceInfo(newPieceInfo);
                   setMessages(["Unlocked piece", `Computer rolls next`]);
@@ -238,30 +207,9 @@ export function GameBoard({ startGameHandler }) {
               }}
             />
           </div>
-          <MoveBox
-            onClickHandler={moveBoxClickHandler}
-            playerPieceInfo={playerPieceInfo}
-            nemesisPieceInfo={nemesisPieceInfo}
-            boxColor={corner_color_map[all_constants.CORNER_INDICES[64]]}
-            idx={64}
-            pieceColor={default_color}
-          />
-          <MoveBox
-            onClickHandler={moveBoxClickHandler}
-            playerPieceInfo={playerPieceInfo}
-            nemesisPieceInfo={nemesisPieceInfo}
-            boxColor={corner_color_map[all_constants.CORNER_INDICES[65]]}
-            idx={65}
-            pieceColor={default_color}
-          />
-          <MoveBox
-            onClickHandler={moveBoxClickHandler}
-            playerPieceInfo={playerPieceInfo}
-            nemesisPieceInfo={nemesisPieceInfo}
-            boxColor={corner_color_map[all_constants.CORNER_INDICES[66]]}
-            idx={66}
-            pieceColor={default_color}
-          />
+          {getMoveBox(64)}
+          {getMoveBox(65)}
+          {getMoveBox(66)}
           <div className="col-span-6 row-span-6">
             <HomeBox
               isPieceEnabled={false}
@@ -275,19 +223,7 @@ export function GameBoard({ startGameHandler }) {
           {Array(15)
             .fill(1)
             .map((option, i) => {
-              return (
-                <MoveBox
-                  onClickHandler={moveBoxClickHandler}
-                  key={i}
-                  playerPieceInfo={playerPieceInfo}
-                  nemesisPieceInfo={nemesisPieceInfo}
-                  boxColor={
-                    corner_color_map[all_constants.CORNER_INDICES[i + 67]]
-                  }
-                  idx={i + 67}
-                  pieceColor={default_color}
-                />
-              );
+              return getMoveBox(i + 67);
             })}
         </div>
         <div>
