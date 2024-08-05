@@ -73,6 +73,9 @@ export function GameBoard({ startGameHandler }) {
         "isOnWinningPath",
         true,
       );
+      if (nextIndex === 6) {
+        newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
+      }
       newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
       newPieceInfo = updatePieceInfo(
         newPieceInfo,
@@ -175,7 +178,9 @@ export function GameBoard({ startGameHandler }) {
 
           <div className="col-span-6 row-span-6">
             <HomeBox
-              isPieceEnabled={currentUserState == "pendingPieceSelection"}
+              isPieceEnabled={
+                true || currentUserState == "pendingPieceSelection"
+              }
               pieceInfo={playerPieceInfo}
               onClickHandler={(key) => {
                 homeBoxClickHandler(key, "Clicked player");
@@ -196,13 +201,13 @@ export function GameBoard({ startGameHandler }) {
                   );
                   setPlayerPieceInfo(newPieceInfo);
                   setMessages(["Unlocked piece", `Computer rolls next`]);
-                  dispatch({
+                  /* dispatch({
                     type: "PieceSelected",
                     diceNumber: rolledNumber,
                   });
                   if (currentUserState == "pendingNemesisTurn") {
                     playNemesis(dispatch);
-                  }
+                  } */
                 }
               }}
             />
@@ -229,19 +234,19 @@ export function GameBoard({ startGameHandler }) {
         <div>
           <InfoBox messages={messages} />
           <Dice
-            isEnabled={currentUserState == "pendingDiceRoll"}
+            isEnabled={true || currentUserState == "pendingDiceRoll"}
             onClickActionHandler={(diceNumber) => {
               setRolledNumber(diceNumber);
               let canMove = isMovePossible(playerPieceInfo, diceNumber);
               if (canMove) {
                 setMessages([`Select a piece to move`]);
-                dispatch({ type: "DiceRolled", diceNumber: diceNumber });
+                // dispatch({ type: "DiceRolled", diceNumber: diceNumber });
               } else {
                 setMessages([
                   "No valid moves available",
                   `Computer rolls next`,
                 ]);
-                dispatch({ type: "PieceSelected", diceNumber: diceNumber });
+                // dispatch({ type: "PieceSelected", diceNumber: diceNumber });
               }
             }}
           />

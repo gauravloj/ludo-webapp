@@ -103,25 +103,25 @@ const CORNER_INDICES = {
 const PLAYER_CONSTANTS = {
   startBoxIndex: 0,
   endBoxIndex: 50,
-  winningPath: [77, 74, 71, 68, 65],
+  winningPath: [-666, 77, 74, 71, 68, 65, -666],
 };
 
 const NEMESIS_CONSTANTS = {
   startBoxIndex: 26,
   endBoxIndex: 24,
-  winningPath: [5, 8, 11, 14, 17],
+  winningPath: [-666, 5, 8, 11, 14, 17, -666],
 };
 
 const MINION_ONE_CONSTANTS = {
   startBoxIndex: 13,
   endBoxIndex: 11,
-  winningPath: [32, 33, 34, 35, 36],
+  winningPath: [-666, 32, 33, 34, 35, 36, -666],
 };
 
 const MINION_TOO_CONSTANTS = {
   startBoxIndex: 39,
   endBoxIndex: 37,
-  winningPath: [41, 40, 39, 38, 37],
+  winningPath: [-666, 41, 40, 39, 38, 37, -666],
 };
 
 const REGULAR_PATH = [
