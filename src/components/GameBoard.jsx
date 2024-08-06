@@ -56,10 +56,6 @@ export function GameBoard({ startGameHandler }) {
   };
   const all_players = helperFunction.initializeAllPlayers(player_color);
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
-  all_players.nemesis["1"].boxIndex = 3;
-  all_players.nemesis["1"].location = 67;
-  all_players.nemesis["2"].boxIndex = 3;
-  all_players.nemesis["2"].location = 67;
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const homeBoxClickHandler = (pieceId, message) => {
     console.log("Clicked piece id:", pieceId, message);

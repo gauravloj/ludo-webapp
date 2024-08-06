@@ -109,9 +109,9 @@ export function isOnWinningPath(pieceInfo, rolledNumber) {
       all_constants.PLAYER_CONSTANTS.endBoxIndex
   );
 }
-export function checkCollision(playerPiecePosition, nemesisPieceInfo) {
-  let collidedPieces = Object.keys(nemesisPieceInfo).filter((piece) => {
-    return nemesisPieceInfo[piece].boxIndex === playerPiecePosition;
+export function checkCollision(piecePosition, pieceInfo) {
+  let collidedPieces = Object.keys(pieceInfo).filter((piece) => {
+    return pieceInfo[piece].boxIndex === piecePosition;
   });
   return [collidedPieces.length === 1, collidedPieces[0]];
 }
