@@ -9,13 +9,13 @@ import { useState } from "react";
 import { useReducer } from "react";
 
 import {
-  getInitialPieceInfo,
   isMoveValid,
   isMovePossible,
   canUnlock,
   updatePieceInfo,
   getNextLocation,
   isOnWinningPath,
+  checkCollision,
 } from "../gameplay";
 import { playNemesis } from "../playerAI";
 import { helperFunction } from "../helper";
@@ -56,8 +56,11 @@ export function GameBoard({ startGameHandler }) {
   };
   const all_players = helperFunction.initializeAllPlayers(player_color);
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
+  all_players.nemesis["1"].boxIndex = 3;
+  all_players.nemesis["1"].location = 67;
+  all_players.nemesis["2"].boxIndex = 3;
+  all_players.nemesis["2"].location = 67;
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
-  const default_color = undefined;
   const homeBoxClickHandler = (pieceId, message) => {
     console.log("Clicked piece id:", pieceId, message);
   };
@@ -97,8 +100,29 @@ export function GameBoard({ startGameHandler }) {
         "location",
         all_constants.REGULAR_PATH[nextIndex],
       );
+      let [isCollison, collisionKey] = checkCollision(
+        nextIndex,
+        nemesisPieceInfo,
+      );
+      if (isCollison) {
+        console.log("Nemesis pieces");
+        let newNemesisPieceInfo;
+        newNemesisPieceInfo = updatePieceInfo(
+          nemesisPieceInfo,
+          collisionKey,
+          "boxIndex",
+          -1,
+        );
+        newNemesisPieceInfo = updatePieceInfo(
+          newNemesisPieceInfo,
+          collisionKey,
+          "location",
+          -1,
+        );
+        setNemesisPieceInfo(newNemesisPieceInfo);
+      }
+      setPlayerPieceInfo(newPieceInfo);
     }
-    setPlayerPieceInfo(newPieceInfo);
     console.log("Moved to next box", playerPieceInfo);
   };
 
@@ -111,7 +135,6 @@ export function GameBoard({ startGameHandler }) {
         nemesisPieceInfo={nemesisPieceInfo}
         boxColor={corner_color_map[all_constants.CORNER_INDICES[idx]]}
         idx={idx}
-        pieceColor={default_color}
       />
     );
   };

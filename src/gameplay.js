@@ -109,25 +109,9 @@ export function isOnWinningPath(pieceInfo, rolledNumber) {
       all_constants.PLAYER_CONSTANTS.endBoxIndex
   );
 }
-
-/**
-  checkForCollision(player, players, index) {
-    var count = 0;
-    var pieces = [];
-    for (let otherPlayer of players) {
-      if (otherPlayer.color != player.color)
-        for (let p of otherPlayer.pieces) {
-          if (p.index == index) {
-            count++;
-            pieces.push(p);
-          }
-        }
-    }
-    if (count == 1) {
-      //Collision
-      pieces[0].index = -1;
-    }
-    // check if the piece will land on another piece
-  }
-
- */
+export function checkCollision(playerPiecePosition, nemesisPieceInfo) {
+  let collidedPieces = Object.keys(nemesisPieceInfo).filter((piece) => {
+    return nemesisPieceInfo[piece].boxIndex === playerPiecePosition;
+  });
+  return [collidedPieces.length === 1, collidedPieces[0]];
+}
