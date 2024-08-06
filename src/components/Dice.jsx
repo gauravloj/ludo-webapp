@@ -13,7 +13,7 @@ const diceFrontMap = {
 };
 export function Dice({ isEnabled, onClickActionHandler }) {
   let [isShowing, setIsShowing] = useState(true);
-  let [diceFront, setDiceFront] = useState(DiceFace1);
+  let [diceFront, setDiceFront] = useState(diceFrontMap["1"]);
 
   return (
     <div className="mt-8 flex flex-col items-center m-8">

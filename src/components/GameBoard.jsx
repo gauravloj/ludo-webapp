@@ -150,6 +150,9 @@ export function GameBoard({ startGameHandler }) {
           <ActionButton
             text="Start New Game"
             onClick={() => {
+              setPlayerPieceInfo(all_players.player);
+              setNemesisPieceInfo(all_players.nemesis);
+              setMessages(["Game restarted"]);
               startGameHandler(true);
             }}
           />
