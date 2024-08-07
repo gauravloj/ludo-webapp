@@ -1,12 +1,12 @@
+import { Button } from "@headlessui/react";
 import { ActionButton } from "./Button";
 import { HomeBox } from "./HomeBox";
 import { MoveBox } from "./MoveBox";
 import { FinalDestination } from "./FinalDestination";
 import { InfoBox } from "./InfoBox";
 import { all_constants } from "../constants";
-import { Dice } from "./Dice";
+import { Dice, diceFrontMap } from "./Dice";
 import { useState } from "react";
-import { useReducer } from "react";
 
 import {
   isMoveValid,
@@ -20,31 +20,14 @@ import {
 import { playNemesis } from "../playerAI";
 import { helperFunction } from "../helper";
 
-function reducer(state, action) {
-  switch (action.type) {
-    case "DiceRolled": {
-      console.log("In Reducer with case DiceRolled", state);
-      return "pendingPieceSelection";
-    }
-    case "PieceSelected": {
-      console.log("In Reducer with case PieceSelected", state);
-      if (action.diceNumber == 6) {
-        return "pendingDiceRoll";
-      }
-      return "pendingNemesisTurn";
-    }
-    case "NemesisPlayed": {
-      console.log("In Reducer with case NemesisPlayed", state);
-      return "pendingDiceRoll";
-    }
-  }
-  throw Error("Unknown action: " + action);
-}
-
 export function GameBoard({ startGameHandler }) {
   const [messages, setMessages] = useState([]);
   const [rolledNumber, setRolledNumber] = useState(1);
-  const [currentUserState, dispatch] = useReducer(reducer, "pendingDiceRoll");
+  const [currentUserState, setCurrentUserState] = useState(
+    all_constants.USER_STATES.pendingDiceRoll,
+  );
+  let [isShowing, setIsShowing] = useState(true);
+  let [diceFront, setDiceFront] = useState(diceFrontMap["1"]);
   const player_color = localStorage.getItem("selectedColor");
   const player_color_index = all_constants.COLOR_SEQUENCE.indexOf(player_color);
   const corner_color_map = {
@@ -59,6 +42,24 @@ export function GameBoard({ startGameHandler }) {
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const homeBoxClickHandler = (pieceId, message) => {
     console.log("Clicked piece id:", pieceId, message);
+  };
+
+  const rollDie = () => {
+    setIsShowing(false);
+    setTimeout(() => {
+      setIsShowing(true);
+      let diceNumber = Math.floor(Math.random() * 6) + 1;
+      setDiceFront(diceFrontMap[diceNumber]);
+      setRolledNumber(diceNumber);
+      let canMove = isMovePossible(nemesisPieceInfo, diceNumber);
+      if (canMove) {
+        setMessages([`Computer rolls ${diceNumber}`, `Select a piece to move`]);
+        setCurrentUserState(all_constants.USER_STATES.pendingPieceSelection);
+      } else {
+        setMessages(["No valid moves available", `Your turn to roll the dice`]);
+        setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+      }
+    }, 500);
   };
 
   const moveBoxClickHandler = (key) => {
@@ -119,13 +120,16 @@ export function GameBoard({ startGameHandler }) {
       }
       setPlayerPieceInfo(newPieceInfo);
     }
-    console.log("Moved to next box", playerPieceInfo);
+    // console.log("Moved to next box", playerPieceInfo);
   };
 
   const getMoveBox = (idx) => {
     return (
       <MoveBox
         key={idx}
+        isPieceEnabled={
+          currentUserState == all_constants.USER_STATES.pendingPieceSelection
+        }
         onClickHandler={moveBoxClickHandler}
         playerPieceInfo={playerPieceInfo}
         nemesisPieceInfo={nemesisPieceInfo}
@@ -153,6 +157,7 @@ export function GameBoard({ startGameHandler }) {
               setPlayerPieceInfo(all_players.player);
               setNemesisPieceInfo(all_players.nemesis);
               setMessages(["Game restarted"]);
+              setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
               startGameHandler(true);
             }}
           />
@@ -201,7 +206,8 @@ export function GameBoard({ startGameHandler }) {
           <div className="col-span-6 row-span-6">
             <HomeBox
               isPieceEnabled={
-                true || currentUserState == "pendingPieceSelection"
+                currentUserState ==
+                all_constants.USER_STATES.pendingPieceSelection
               }
               pieceInfo={playerPieceInfo}
               onClickHandler={(key) => {
@@ -223,13 +229,24 @@ export function GameBoard({ startGameHandler }) {
                   );
                   setPlayerPieceInfo(newPieceInfo);
                   setMessages(["Unlocked piece", `Computer rolls next`]);
-                  /* dispatch({
-                    type: "PieceSelected",
-                    diceNumber: rolledNumber,
-                  });
-                  if (currentUserState == "pendingNemesisTurn") {
-                    playNemesis(dispatch);
-                  } */
+                  if (rolledNumber === 6) {
+                    setCurrentUserState(
+                      all_constants.USER_STATES.pendingDiceRoll,
+                    );
+                  } else {
+                    setTimeout(() => {
+                      console.log("Computer's timeout turn");
+                      playNemesis(rollDie, () => {
+                        setCurrentUserState(
+                          all_constants.USER_STATES.pendingDiceRoll,
+                        );
+                      });
+                    }, 1000);
+                    console.log("Computer's turn");
+                    setCurrentUserState(
+                      all_constants.USER_STATES.pendingNemesisTurn,
+                    );
+                  }
                 }
               }}
             />
@@ -255,23 +272,21 @@ export function GameBoard({ startGameHandler }) {
         </div>
         <div>
           <InfoBox messages={messages} />
-          <Dice
-            isEnabled={true || currentUserState == "pendingDiceRoll"}
-            onClickActionHandler={(diceNumber) => {
-              setRolledNumber(diceNumber);
-              let canMove = isMovePossible(playerPieceInfo, diceNumber);
-              if (canMove) {
-                setMessages([`Select a piece to move`]);
-                // dispatch({ type: "DiceRolled", diceNumber: diceNumber });
-              } else {
-                setMessages([
-                  "No valid moves available",
-                  `Computer rolls next`,
-                ]);
-                // dispatch({ type: "PieceSelected", diceNumber: diceNumber });
+
+          <div className="mt-8 flex flex-col items-center m-8">
+            <Dice diceFront={diceFront} isShowing={isShowing} />
+
+            <Button
+              id="diceButtonId"
+              disabled={
+                currentUserState !== all_constants.USER_STATES.pendingDiceRoll
               }
-            }}
-          />
+              onClick={rollDie}
+              className="mt-10 flex items-center gap-2 rounded-full bg-white/10 py-1 px-3 text-sm/6 font-semibold transition data-[hover]:scale-105 data-[hover]:bg-white/15"
+            >
+              <span>Roll that die!</span>
+            </Button>
+          </div>
         </div>
       </div>
     </>

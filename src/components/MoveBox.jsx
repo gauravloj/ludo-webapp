@@ -4,6 +4,7 @@ import { PlayerPiece } from "./PlayerPiece";
 export function MoveBox({
   boxColor,
   idx,
+  isPieceEnabled,
   playerPieceInfo,
   nemesisPieceInfo,
   onClickHandler,
@@ -49,7 +50,9 @@ export function MoveBox({
                 color={all_constants.COLORS_HEX[playerPieceInfo.color]}
                 boxColor={boxColor}
                 onClick={() => {
-                  onClickHandler(key);
+                  if (isPieceEnabled) {
+                    onClickHandler(key);
+                  }
                 }}
               />
             </div>

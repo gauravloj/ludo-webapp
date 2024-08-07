@@ -130,14 +130,21 @@ const REGULAR_PATH = [
   52, 51, 50, 49, 66, 69, 72, 75, 78, 81, 80, 79,
 ];
 
+const USER_STATES = {
+  pendingDiceRoll: "pendingDiceRoll",
+  pendingPieceSelection: "pendingPieceSelection",
+  pendingNemesisTurn: "pendingNemesisTurn",
+};
+
 export const all_constants = {
   COLORS,
   COLORS_HEX,
   COLOR_SEQUENCE,
   CORNER_INDICES,
-  REGULAR_PATH,
-  PLAYER_CONSTANTS,
-  NEMESIS_CONSTANTS,
   MINION_ONE_CONSTANTS,
   MINION_TOO_CONSTANTS,
+  NEMESIS_CONSTANTS,
+  PLAYER_CONSTANTS,
+  REGULAR_PATH,
+  USER_STATES,
 };

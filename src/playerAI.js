@@ -1,13 +1,16 @@
-export function playNemesis(dispatch) {
+export function playNemesis(rollDie, finishTurnCallback) {
+  rollDie();
+  console.log("Nemesis played");
   setTimeout(() => {
-    rollDice();
-  }, 5000);
-  dispatch({ type: "NemesisPlayed" });
+    console.log("Nemesis finished playing");
+    finishTurnCallback();
+  }, 1000);
 }
 function rollDice() {
   let diceElement = document.getElementById("diceButtonId");
   diceElement.setAttribute("disabled", false);
   diceElement.onclick();
+  console.log("Nemesis clicked dice button");
   //diceElement.click();
   diceElement.setAttribute("disabled", true);
 }
