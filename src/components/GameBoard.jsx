@@ -19,12 +19,15 @@ import {
 } from "../gameplay";
 import { playNemesis } from "../playerAI";
 import { helperFunction } from "../helper";
+import { EventEmitter } from "events";
 
+const eventEmitter = new EventEmitter();
+let isEventRegistered = false;
 export function GameBoard({ startGameHandler }) {
   const [messages, setMessages] = useState([]);
   const [rolledNumber, setRolledNumber] = useState(1);
   const [currentUserState, setCurrentUserState] = useState(
-    all_constants.USER_STATES.pendingDiceRoll,
+    all_constants.USER_STATES.pendingDiceRoll
   );
   let [isShowing, setIsShowing] = useState(true);
   let [diceFront, setDiceFront] = useState(diceFrontMap["1"]);
@@ -44,24 +47,60 @@ export function GameBoard({ startGameHandler }) {
     console.log("Clicked piece id:", pieceId, message);
   };
 
-  const rollDie = () => {
+  const playerRoll = (diceNumber) => {
+    let canMove = isMovePossible(playerPieceInfo, diceNumber);
+    if (canMove) {
+      setMessages([`You rolled ${diceNumber}`, `Select a piece to move`]);
+      setCurrentUserState(all_constants.USER_STATES.pendingPieceSelection);
+      eventEmitter.emit("start", "player");
+    } else {
+      setMessages([
+        "No valid moves available",
+        `Nemesis turn to roll the dice`,
+      ]);
+      setCurrentUserState(all_constants.USER_STATES.pendingNemesisTurn);
+      eventEmitter.emit("playNemesis", "player in non");
+    }
+  };
+  const nemesisRoll = (diceNumber) => {
+    let canMove = isMovePossible(nemesisPieceInfo, diceNumber);
+    console.log(`In nemesis Roll function: ${canMove}`);
+    if (canMove) {
+      setMessages([
+        `Nemesis rolled ${diceNumber}`,
+        `Nemesis will select a piece to move`,
+      ]);
+      eventEmitter.emit("start", "nemesis");
+    } else {
+      setMessages(["No valid moves available", `Your turn to roll the dice`]);
+    }
+    setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+  };
+  const rollDie = (callRolledMessage) => {
     setIsShowing(false);
     setTimeout(() => {
       setIsShowing(true);
       let diceNumber = Math.floor(Math.random() * 6) + 1;
       setDiceFront(diceFrontMap[diceNumber]);
       setRolledNumber(diceNumber);
-      let canMove = isMovePossible(nemesisPieceInfo, diceNumber);
-      if (canMove) {
-        setMessages([`Computer rolls ${diceNumber}`, `Select a piece to move`]);
-        setCurrentUserState(all_constants.USER_STATES.pendingPieceSelection);
-      } else {
-        setMessages(["No valid moves available", `Your turn to roll the dice`]);
-        setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
-      }
+      callRolledMessage(diceNumber);
     }, 500);
   };
-
+  if (!isEventRegistered) {
+    eventEmitter.on("start", (who) => {
+      console.log(`Event Emitter started by ${who}`);
+    });
+    eventEmitter.on("playNemesis", (who) => {
+      console.log(`Time to start nemesis play`);
+      //      playNemesis(rollDie, nemesisRoll, setCurrentUserState);
+      rollDie((diceNumber) => {
+        nemesisRoll(diceNumber);
+        console.log("Nemesis played");
+        //movePiece();
+      });
+    });
+    isEventRegistered = true;
+  }
   const moveBoxClickHandler = (key) => {
     let isWinningPath = isOnWinningPath(playerPieceInfo[key], rolledNumber);
     let newPieceInfo;
@@ -71,7 +110,7 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "isOnWinningPath",
-        true,
+        true
       );
       if (nextIndex === 6) {
         newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
@@ -81,7 +120,7 @@ export function GameBoard({ startGameHandler }) {
         newPieceInfo,
         key,
         "location",
-        playerPieceInfo[key].winningPath[nextIndex],
+        playerPieceInfo[key].winningPath[nextIndex]
       );
     } else {
       let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
@@ -89,17 +128,17 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "boxIndex",
-        nextIndex,
+        nextIndex
       );
       newPieceInfo = updatePieceInfo(
         newPieceInfo,
         key,
         "location",
-        all_constants.REGULAR_PATH[nextIndex],
+        all_constants.REGULAR_PATH[nextIndex]
       );
       let [isCollison, collisionKey] = checkCollision(
         nextIndex,
-        nemesisPieceInfo,
+        nemesisPieceInfo
       );
       if (isCollison) {
         console.log("Nemesis pieces");
@@ -108,13 +147,13 @@ export function GameBoard({ startGameHandler }) {
           nemesisPieceInfo,
           collisionKey,
           "boxIndex",
-          -1,
+          -1
         );
         newNemesisPieceInfo = updatePieceInfo(
           newNemesisPieceInfo,
           collisionKey,
           "location",
-          -1,
+          -1
         );
         setNemesisPieceInfo(newNemesisPieceInfo);
       }
@@ -219,32 +258,28 @@ export function GameBoard({ startGameHandler }) {
                     playerPieceInfo,
                     key,
                     "boxIndex",
-                    nextIndex,
+                    nextIndex
                   );
                   newPieceInfo = updatePieceInfo(
                     newPieceInfo,
                     key,
                     "location",
-                    all_constants.REGULAR_PATH[nextIndex],
+                    all_constants.REGULAR_PATH[nextIndex]
                   );
                   setPlayerPieceInfo(newPieceInfo);
                   setMessages(["Unlocked piece", `Computer rolls next`]);
                   if (rolledNumber === 6) {
                     setCurrentUserState(
-                      all_constants.USER_STATES.pendingDiceRoll,
+                      all_constants.USER_STATES.pendingDiceRoll
                     );
                   } else {
                     setTimeout(() => {
                       console.log("Computer's timeout turn");
-                      playNemesis(rollDie, () => {
-                        setCurrentUserState(
-                          all_constants.USER_STATES.pendingDiceRoll,
-                        );
-                      });
+                      playNemesis(rollDie, nemesisRoll);
                     }, 1000);
                     console.log("Computer's turn");
                     setCurrentUserState(
-                      all_constants.USER_STATES.pendingNemesisTurn,
+                      all_constants.USER_STATES.pendingNemesisTurn
                     );
                   }
                 }
@@ -281,7 +316,9 @@ export function GameBoard({ startGameHandler }) {
               disabled={
                 currentUserState !== all_constants.USER_STATES.pendingDiceRoll
               }
-              onClick={rollDie}
+              onClick={() => {
+                rollDie(playerRoll);
+              }}
               className="mt-10 flex items-center gap-2 rounded-full bg-white/10 py-1 px-3 text-sm/6 font-semibold transition data-[hover]:scale-105 data-[hover]:bg-white/15"
             >
               <span>Roll that die!</span>

@@ -4,11 +4,8 @@ export function getLockedPiecesCount(playerPieceInfo) {
   return Object.values(playerPieceInfo).filter((piece) => piece.location === -1)
     .length;
 }
-export function isMovePossible(playerPieceInfo, rolledNumber) {
-  if (
-    getLockedPiecesCount(playerPieceInfo) == 4 &&
-    ![1, 6].includes(rolledNumber)
-  ) {
+export function isMovePossible(pieceInfo, rolledNumber) {
+  if (getLockedPiecesCount(pieceInfo) == 4 && ![1, 6].includes(rolledNumber)) {
     return false;
   }
   //Add other conditions
@@ -19,7 +16,7 @@ export function getInitialPieceInfo(
   color,
   startBoxIndex,
   endBoxIndex,
-  winningPath,
+  winningPath
 ) {
   return {
     1: {
