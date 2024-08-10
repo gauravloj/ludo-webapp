@@ -6,10 +6,9 @@ import { FinalDestination } from "./FinalDestination";
 import { InfoBox } from "./InfoBox";
 import { all_constants } from "../constants";
 import { Dice, diceFrontMap } from "./Dice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
-  isMoveValid,
   isMovePossible,
   canUnlock,
   updatePieceInfo,
@@ -18,16 +17,13 @@ import {
   checkCollision,
 } from "../gameplay";
 import { playNemesis } from "../playerAI";
-import { helperFunction } from "../helper";
-import { EventEmitter } from "events";
+import { initializeAllPlayers, p } from "../helper";
 
-const eventEmitter = new EventEmitter();
-let isEventRegistered = false;
 export function GameBoard({ startGameHandler }) {
   const [messages, setMessages] = useState([]);
   const [rolledNumber, setRolledNumber] = useState(1);
   const [currentUserState, setCurrentUserState] = useState(
-    all_constants.USER_STATES.pendingDiceRoll
+    all_constants.USER_STATES.pendingDiceRoll,
   );
   let [isShowing, setIsShowing] = useState(true);
   let [diceFront, setDiceFront] = useState(diceFrontMap["1"]);
@@ -40,42 +36,44 @@ export function GameBoard({ startGameHandler }) {
     top_left: all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
     common: all_constants.COLORS.white,
   };
-  const all_players = helperFunction.initializeAllPlayers(player_color);
+  const all_players = initializeAllPlayers(player_color);
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const homeBoxClickHandler = (pieceId, message) => {
-    console.log("Clicked piece id:", pieceId, message);
+    p("Clicked piece id:", pieceId, message);
   };
 
   const playerRoll = (diceNumber) => {
+    p("In playerRoll");
     let canMove = isMovePossible(playerPieceInfo, diceNumber);
     if (canMove) {
       setMessages([`You rolled ${diceNumber}`, `Select a piece to move`]);
       setCurrentUserState(all_constants.USER_STATES.pendingPieceSelection);
-      eventEmitter.emit("start", "player");
     } else {
       setMessages([
         "No valid moves available",
         `Nemesis turn to roll the dice`,
       ]);
       setCurrentUserState(all_constants.USER_STATES.pendingNemesisTurn);
-      eventEmitter.emit("playNemesis", "player in non");
     }
   };
   const nemesisRoll = (diceNumber) => {
+    p("In nemesisRoll");
     let canMove = isMovePossible(nemesisPieceInfo, diceNumber);
-    console.log(`In nemesis Roll function: ${canMove}`);
+    p(`In nemesis Roll function: ${canMove}`);
     if (canMove) {
+      p("nemesisRoll: ", "Nemesis can move");
       setMessages([
         `Nemesis rolled ${diceNumber}`,
         `Nemesis will select a piece to move`,
       ]);
-      eventEmitter.emit("start", "nemesis");
     } else {
+      p("nemesisRoll: ", "Nemesis cannot move");
       setMessages(["No valid moves available", `Your turn to roll the dice`]);
     }
     setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
   };
+
   const rollDie = (callRolledMessage) => {
     setIsShowing(false);
     setTimeout(() => {
@@ -86,22 +84,11 @@ export function GameBoard({ startGameHandler }) {
       callRolledMessage(diceNumber);
     }, 500);
   };
-  if (!isEventRegistered) {
-    eventEmitter.on("start", (who) => {
-      console.log(`Event Emitter started by ${who}`);
-    });
-    eventEmitter.on("playNemesis", (who) => {
-      console.log(`Time to start nemesis play`);
-      //      playNemesis(rollDie, nemesisRoll, setCurrentUserState);
-      rollDie((diceNumber) => {
-        nemesisRoll(diceNumber);
-        console.log("Nemesis played");
-        //movePiece();
-      });
-    });
-    isEventRegistered = true;
-  }
+
   const moveBoxClickHandler = (key) => {
+    if (currentUserState !== all_constants.USER_STATES.pendingPieceSelection) {
+      return;
+    }
     let isWinningPath = isOnWinningPath(playerPieceInfo[key], rolledNumber);
     let newPieceInfo;
     if (isWinningPath) {
@@ -110,7 +97,7 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "isOnWinningPath",
-        true
+        true,
       );
       if (nextIndex === 6) {
         newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
@@ -120,7 +107,7 @@ export function GameBoard({ startGameHandler }) {
         newPieceInfo,
         key,
         "location",
-        playerPieceInfo[key].winningPath[nextIndex]
+        playerPieceInfo[key].winningPath[nextIndex],
       );
     } else {
       let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
@@ -128,39 +115,59 @@ export function GameBoard({ startGameHandler }) {
         playerPieceInfo,
         key,
         "boxIndex",
-        nextIndex
+        nextIndex,
       );
       newPieceInfo = updatePieceInfo(
         newPieceInfo,
         key,
         "location",
-        all_constants.REGULAR_PATH[nextIndex]
+        all_constants.REGULAR_PATH[nextIndex],
       );
       let [isCollison, collisionKey] = checkCollision(
         nextIndex,
-        nemesisPieceInfo
+        nemesisPieceInfo,
       );
       if (isCollison) {
-        console.log("Nemesis pieces");
+        p("Nemesis pieces");
         let newNemesisPieceInfo;
         newNemesisPieceInfo = updatePieceInfo(
           nemesisPieceInfo,
           collisionKey,
           "boxIndex",
-          -1
+          -1,
         );
         newNemesisPieceInfo = updatePieceInfo(
           newNemesisPieceInfo,
           collisionKey,
           "location",
-          -1
+          -1,
         );
         setNemesisPieceInfo(newNemesisPieceInfo);
       }
       setPlayerPieceInfo(newPieceInfo);
     }
-    // console.log("Moved to next box", playerPieceInfo);
+    p("moveBoxClickHandler", "Moved to next box");
+    if (rolledNumber === 6) {
+      setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+    } else {
+      setCurrentUserState(all_constants.USER_STATES.pendingNemesisTurn);
+    }
   };
+
+  useEffect(() => {
+    p("useEffect: ", "Current user state", currentUserState);
+    if (currentUserState === all_constants.USER_STATES.pendingNemesisTurn) {
+      p("useEffect: ", "Nemesis turn");
+
+      setTimeout(() => {
+        rollDie((diceNumber) => {
+          nemesisRoll(diceNumber);
+          p("rollDie: ", "Nemesis played", diceNumber);
+          //movePiece();
+        });
+      }, 3000);
+    }
+  }, [currentUserState]);
 
   const getMoveBox = (idx) => {
     return (
@@ -258,28 +265,28 @@ export function GameBoard({ startGameHandler }) {
                     playerPieceInfo,
                     key,
                     "boxIndex",
-                    nextIndex
+                    nextIndex,
                   );
                   newPieceInfo = updatePieceInfo(
                     newPieceInfo,
                     key,
                     "location",
-                    all_constants.REGULAR_PATH[nextIndex]
+                    all_constants.REGULAR_PATH[nextIndex],
                   );
                   setPlayerPieceInfo(newPieceInfo);
                   setMessages(["Unlocked piece", `Computer rolls next`]);
                   if (rolledNumber === 6) {
                     setCurrentUserState(
-                      all_constants.USER_STATES.pendingDiceRoll
+                      all_constants.USER_STATES.pendingDiceRoll,
                     );
                   } else {
                     setTimeout(() => {
-                      console.log("Computer's timeout turn");
+                      p("Computer's timeout turn");
                       playNemesis(rollDie, nemesisRoll);
                     }, 1000);
-                    console.log("Computer's turn");
+                    p("Computer's turn");
                     setCurrentUserState(
-                      all_constants.USER_STATES.pendingNemesisTurn
+                      all_constants.USER_STATES.pendingNemesisTurn,
                     );
                   }
                 }

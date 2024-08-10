@@ -1,6 +1,7 @@
 import { all_constants } from "./constants";
 import { getInitialPieceInfo } from "./gameplay";
-function initializeAllPlayers(player_color) {
+
+export function initializeAllPlayers(player_color) {
   const player_color_index = all_constants.COLOR_SEQUENCE.indexOf(player_color);
   return {
     // bottom left
@@ -34,4 +35,8 @@ function initializeAllPlayers(player_color) {
   };
 }
 
-export const helperFunction = { initializeAllPlayers };
+export function p() {
+  console.log(...arguments);
+}
+
+// export const helperFunction = { initializeAllPlayers, p };

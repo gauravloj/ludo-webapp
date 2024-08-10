@@ -16,7 +16,7 @@ export function getInitialPieceInfo(
   color,
   startBoxIndex,
   endBoxIndex,
-  winningPath
+  winningPath,
 ) {
   return {
     1: {
