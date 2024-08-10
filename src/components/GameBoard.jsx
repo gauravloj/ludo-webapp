@@ -16,7 +16,7 @@ import {
   isOnWinningPath,
   checkCollision,
 } from "../gameplay";
-import { playNemesis } from "../playerAI";
+import { movePiece } from "../playerAI";
 import { initializeAllPlayers, p } from "../helper";
 
 export function GameBoard({ startGameHandler }) {
@@ -63,13 +63,15 @@ export function GameBoard({ startGameHandler }) {
     p(`In nemesis Roll function: ${canMove}`);
     if (canMove) {
       p("nemesisRoll: ", "Nemesis can move");
-      setMessages([
-        `Nemesis rolled ${diceNumber}`,
-        `Nemesis will select a piece to move`,
-      ]);
+      let nextState = movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo);
+      setNemesisPieceInfo(nextState);
+      setMessages([`Nemesis rolled ${diceNumber}`, `Nemesis played the turn`]);
     } else {
       p("nemesisRoll: ", "Nemesis cannot move");
-      setMessages(["No valid moves available", `Your turn to roll the dice`]);
+      setMessages([
+        "No valid moves available for Nemesis",
+        `Your turn to roll the dice`,
+      ]);
     }
     setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
   };
@@ -163,7 +165,6 @@ export function GameBoard({ startGameHandler }) {
         rollDie((diceNumber) => {
           nemesisRoll(diceNumber);
           p("rollDie: ", "Nemesis played", diceNumber);
-          //movePiece();
         });
       }, 3000);
     }
@@ -280,11 +281,6 @@ export function GameBoard({ startGameHandler }) {
                       all_constants.USER_STATES.pendingDiceRoll,
                     );
                   } else {
-                    setTimeout(() => {
-                      p("Computer's timeout turn");
-                      playNemesis(rollDie, nemesisRoll);
-                    }, 1000);
-                    p("Computer's turn");
                     setCurrentUserState(
                       all_constants.USER_STATES.pendingNemesisTurn,
                     );
