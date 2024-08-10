@@ -1,4 +1,4 @@
-import { getLockedPiecesCount } from "../src/gameplay";
+import { getLockedPiecesCount } from "../gameplay";
 
 function getTestInitialPieceInfo() {
   return {

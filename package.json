@@ -15,7 +15,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "NODE_OPTIONS='--experimental-vm-modules --experimental-specifier-resolution=node --trace-warnings' node node_modules/jest/bin/jest.js --detectOpenHandles",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "buildcss-dev": "npx tailwindcss -i ./src/input.css -o ./src/index.css --watch",
     "buildcss-prod": "npx tailwindcss -i ./src/input.css -o ./src/index.css --minify"
