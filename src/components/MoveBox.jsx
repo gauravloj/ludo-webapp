@@ -1,4 +1,5 @@
 import { all_constants } from "../constants";
+import { colorSymbol } from "../gameplay";
 import { PlayerPiece } from "./PlayerPiece";
 
 export function MoveBox({
@@ -28,7 +29,7 @@ export function MoveBox({
               key={key}
             >
               <PlayerPiece
-                color={all_constants.COLORS_HEX[nemesisPieceInfo.color]}
+                color={all_constants.COLORS_HEX[nemesisPieceInfo[colorSymbol]]}
                 boxColor={boxColor}
               />
             </div>
@@ -47,7 +48,7 @@ export function MoveBox({
               key={key}
             >
               <PlayerPiece
-                color={all_constants.COLORS_HEX[playerPieceInfo.color]}
+                color={all_constants.COLORS_HEX[playerPieceInfo[colorSymbol]]}
                 boxColor={boxColor}
                 onClick={() => {
                   if (isPieceEnabled) {

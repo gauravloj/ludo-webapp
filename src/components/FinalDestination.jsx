@@ -1,12 +1,8 @@
 import { all_constants } from "../constants";
+import { colorSymbol } from "../gameplay";
 import { PlayerPiece } from "./PlayerPiece";
 
-export function FinalDestination({
-  playerPieces,
-  minionOnePieces,
-  minionTooPieces,
-  nemesisPieces,
-}) {
+export function FinalDestination({ playerPieces, nemesisPieces }) {
   return (
     <div
       className={`w-full h-full border-solid border-2 border-black bg-pink-200 flex justify-center items-center`}
@@ -17,7 +13,7 @@ export function FinalDestination({
           return piece.isCompleted ? (
             <PlayerPiece
               key={key}
-              color={all_constants.COLORS_HEX[nemesisPieces.color]}
+              color={all_constants.COLORS_HEX[nemesisPieces[colorSymbol]]}
             />
           ) : (
             key !== "color" && <div key={key} />
@@ -28,7 +24,7 @@ export function FinalDestination({
           return piece.isCompleted ? (
             <PlayerPiece
               key={key}
-              color={all_constants.COLORS_HEX[playerPieces.color]}
+              color={all_constants.COLORS_HEX[playerPieces[colorSymbol]]}
             />
           ) : (
             key !== "color" && <div key={key} />

@@ -11,9 +11,9 @@ export function isMovePossible(pieceInfo, rolledNumber) {
   //Add other conditions
   return true;
 }
-
+export const colorSymbol = Symbol("color");
 export function getInitialPieceInfo(
-  color,
+  pieceColor,
   startBoxIndex,
   endBoxIndex,
   winningPath,
@@ -59,7 +59,7 @@ export function getInitialPieceInfo(
       winningPath: winningPath,
       isCompleted: false,
     },
-    color: color,
+    [colorSymbol]: pieceColor,
   };
 }
 
@@ -73,6 +73,7 @@ export function canUnlock(rolledNumber) {
 export function updatePieceInfo(pieceInfo, pieceIndex, keyName, newValue) {
   let oldValue = JSON.parse(JSON.stringify(pieceInfo));
   oldValue[pieceIndex][keyName] = newValue;
+  oldValue[colorSymbol] = pieceInfo[colorSymbol];
   return oldValue;
 }
 

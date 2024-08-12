@@ -1,5 +1,5 @@
 import { all_constants } from "../constants";
-import { getInitialPieceInfo } from "../gameplay";
+import { colorSymbol } from "../gameplay";
 import { PlayerPiece } from "./PlayerPiece";
 
 function PieceHome({ color }) {
@@ -9,7 +9,7 @@ function PieceHome({ color }) {
 export function HomeBox({ isPieceEnabled, pieceInfo, onClickHandler }) {
   return (
     <div
-      className={`w-full h-full border-solid border-2 border-black ${pieceInfo.color} flex justify-center items-center`}
+      className={`w-full h-full border-solid border-2 border-black ${pieceInfo[colorSymbol]} flex justify-center items-center`}
     >
       <div className="m-2 rotate-45 w-4/6 h-4/6 bg-white rounded-xl grid grid-cols-2 grid-rows-2 place-items-center">
         {Object.keys(pieceInfo).map((key) => {
@@ -18,14 +18,14 @@ export function HomeBox({ isPieceEnabled, pieceInfo, onClickHandler }) {
             <PlayerPiece
               disabled={!isPieceEnabled}
               key={key}
-              color={all_constants.COLORS_HEX[pieceInfo.color]}
+              color={all_constants.COLORS_HEX[pieceInfo[colorSymbol]]}
               boxColor={all_constants.COLORS.white}
               onClick={() => {
                 isPieceEnabled && onClickHandler(key);
               }}
             />
           ) : (
-            <PieceHome key={key} color={pieceInfo.color} />
+            <PieceHome key={key} color={pieceInfo[colorSymbol]} />
           );
         })}
       </div>

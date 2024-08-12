@@ -37,12 +37,16 @@ export function GameBoard({ startGameHandler }) {
     common: all_constants.COLORS.white,
   };
   const all_players = initializeAllPlayers(player_color);
+  // Uncomment to test specific cases
+  // all_players.player[1].location = 81;
+  // all_players.nemesis[1].location = 4;
+  // all_players.player[1].boxIndex = 49;
+  // all_players.nemesis[1].boxIndex = 22;
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const homeBoxClickHandler = (pieceId, message) => {
     p("Clicked piece id:", pieceId, message);
   };
-
   const playerRoll = (diceNumber) => {
     p("In playerRoll");
     let canMove = isMovePossible(playerPieceInfo, diceNumber);
@@ -73,7 +77,15 @@ export function GameBoard({ startGameHandler }) {
         `Your turn to roll the dice`,
       ]);
     }
-    setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+    if (diceNumber == 6) {
+      setCurrentUserState(
+        currentUserState == all_constants.USER_STATES.pendingSecondNemesisTurn
+          ? all_constants.USER_STATES.pendingNemesisTurn
+          : all_constants.USER_STATES.pendingSecondNemesisTurn,
+      );
+    } else {
+      setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+    }
   };
 
   const rollDie = (callRolledMessage) => {
@@ -146,8 +158,8 @@ export function GameBoard({ startGameHandler }) {
         );
         setNemesisPieceInfo(newNemesisPieceInfo);
       }
-      setPlayerPieceInfo(newPieceInfo);
     }
+    setPlayerPieceInfo(newPieceInfo);
     p("moveBoxClickHandler", "Moved to next box");
     if (rolledNumber === 6) {
       setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
@@ -158,7 +170,10 @@ export function GameBoard({ startGameHandler }) {
 
   useEffect(() => {
     p("useEffect: ", "Current user state", currentUserState);
-    if (currentUserState === all_constants.USER_STATES.pendingNemesisTurn) {
+    if (
+      currentUserState === all_constants.USER_STATES.pendingNemesisTurn ||
+      currentUserState === all_constants.USER_STATES.pendingSecondNemesisTurn
+    ) {
       p("useEffect: ", "Nemesis turn");
 
       setTimeout(() => {
