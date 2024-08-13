@@ -1,4 +1,5 @@
 import { all_constants } from "./constants";
+import { p } from "./helper";
 
 export function getLockedPiecesCount(playerPieceInfo) {
   return Object.values(playerPieceInfo).filter((piece) => piece.location === -1)
@@ -109,7 +110,72 @@ export function isOnWinningPath(pieceInfo, rolledNumber) {
 }
 export function checkCollision(piecePosition, pieceInfo) {
   let collidedPieces = Object.keys(pieceInfo).filter((piece) => {
-    return pieceInfo[piece].boxIndex === piecePosition;
+    return pieceInfo[piece].location === piecePosition;
   });
+
+  // TODO: Add logice to check safe boxes
+
   return [collidedPieces.length === 1, collidedPieces[0]];
+}
+
+export function movePlayerPiece(
+  playerPieceInfo,
+  nemesisPieceInfo,
+  key,
+  rolledNumber,
+) {
+  let newNemesisPieceInfo = nemesisPieceInfo;
+  let isCollison = false,
+    collisionKey;
+  let isWinningPath = isOnWinningPath(playerPieceInfo[key], rolledNumber);
+  let newPieceInfo;
+  if (isWinningPath) {
+    let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
+    newPieceInfo = updatePieceInfo(
+      playerPieceInfo,
+      key,
+      "isOnWinningPath",
+      true,
+    );
+    if (nextIndex === 6) {
+      newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
+    }
+    newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
+    newPieceInfo = updatePieceInfo(
+      newPieceInfo,
+      key,
+      "location",
+      playerPieceInfo[key].winningPath[nextIndex],
+    );
+  } else {
+    let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
+    newPieceInfo = updatePieceInfo(playerPieceInfo, key, "boxIndex", nextIndex);
+    newPieceInfo = updatePieceInfo(
+      newPieceInfo,
+      key,
+      "location",
+      all_constants.REGULAR_PATH[nextIndex],
+    );
+    [isCollison, collisionKey] = checkCollision(
+      all_constants.REGULAR_PATH[nextIndex],
+      nemesisPieceInfo,
+    );
+    if (isCollison) {
+      p("Nemesis pieces");
+      newNemesisPieceInfo = updatePieceInfo(
+        nemesisPieceInfo,
+        collisionKey,
+        "boxIndex",
+        -1,
+      );
+      newNemesisPieceInfo = updatePieceInfo(
+        newNemesisPieceInfo,
+        collisionKey,
+        "location",
+        -1,
+      );
+    }
+  }
+
+  return [newPieceInfo, isCollison, newNemesisPieceInfo];
 }

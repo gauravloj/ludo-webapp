@@ -1,5 +1,6 @@
 import { all_constants } from "./constants";
 import { getLockedPiecesCount, updatePieceInfo } from "./gameplay";
+
 export function playNemesis(rollDie, nemesisRoll, setCurrentUserState) {
   rollDie((diceNumber) => {
     nemesisRoll(diceNumber);
@@ -13,13 +14,6 @@ export function playNemesis(rollDie, nemesisRoll, setCurrentUserState) {
   //     finishTurnCallback();
   //   }, 1000);
 }
-export function isOnWinningPath(pieceInfo, rolledNumber) {
-  return (
-    pieceInfo.isOnWinningPath ||
-    pieceInfo.boxIndex + rolledNumber - pieceInfo.startBoxIndex >
-      all_constants.NEMESIS_CONSTANTS.endBoxIndex
-  );
-}
 
 function getNextNemesisLocation(pieceInfo, rolledNumber) {
   if (pieceInfo.isOnWinningPath) {
@@ -30,21 +24,28 @@ function getNextNemesisLocation(pieceInfo, rolledNumber) {
   }
 
   let nextIndex = pieceInfo.boxIndex;
-  if (
-    nextIndex < all_constants.NEMESIS_CONSTANTS.endBoxIndex &&
-    nextIndex + rolledNumber - pieceInfo.startBoxIndex >=
-      all_constants.NEMESIS_CONSTANTS.endBoxIndex
-  ) {
-    nextIndex = nextIndex + rolledNumber - pieceInfo.endBoxIndex;
+  if (!isOnWinningPath(pieceInfo, rolledNumber)) {
+    nextIndex = (nextIndex + rolledNumber) % 52;
   } else {
-    nextIndex = nextIndex + rolledNumber;
-    nextIndex = nextIndex % all_constants.REGULAR_PATH.length;
+    nextIndex = nextIndex + rolledNumber - pieceInfo.endBoxIndex;
   }
   return nextIndex;
 }
 
+function isOnWinningPath(pieceInfo, rolledNumber) {
+  if (pieceInfo.isOnWinningPath) {
+    return true;
+  }
+
+  return (
+    pieceInfo.boxIndex <= pieceInfo.endBoxIndex &&
+    pieceInfo.boxIndex + rolledNumber > pieceInfo.endBoxIndex
+  );
+}
+
 export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
   // check for lockedPieces
+  let nextIndex;
   let lockedPieces = getLockedPiecesCount(nemesisPieceInfo);
   if ((diceNumber === 6 || diceNumber === 1) && lockedPieces > 0) {
     let toUnlock = Object.keys(nemesisPieceInfo).filter(
@@ -52,7 +53,7 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
     )[0];
     // if lockedPieces, move them
     // play the first unlocked piece
-    let nextIndex = nemesisPieceInfo[toUnlock].startBoxIndex;
+    nextIndex = nemesisPieceInfo[toUnlock].startBoxIndex;
     let newInfo = updatePieceInfo(
       nemesisPieceInfo,
       toUnlock,
@@ -63,33 +64,71 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
     console.log("Nemesis unlocked piece", toUnlock);
     return newInfo;
   }
+
+  // play first unlocked piece
   if (lockedPieces < 4) {
-    let pieceKeys = Object.keys(nemesisPieceInfo).filter(
-      (piece) => nemesisPieceInfo[piece].location !== -1,
+    let unlockedPieceKeys = Object.keys(nemesisPieceInfo).filter(
+      (piece) =>
+        nemesisPieceInfo[piece].location !== -1 &&
+        !nemesisPieceInfo[piece].isCompleted,
     );
     let nextLocations = {};
-    pieceKeys.forEach((keyName) => {
+    unlockedPieceKeys.forEach((keyName) => {
       nextLocations[keyName] = getNextNemesisLocation(
         nemesisPieceInfo[keyName],
         diceNumber,
       );
     });
-    if (pieceKeys.length >= 1) {
-      let newInfo = updatePieceInfo(
-        nemesisPieceInfo,
-        pieceKeys[0],
-        "location",
-        all_constants.REGULAR_PATH[nextLocations[pieceKeys[0]]],
+
+    let newPieceInfo = nemesisPieceInfo;
+    let isOnWinningPathFlag = isOnWinningPath(
+      newPieceInfo[unlockedPieceKeys[0]],
+      diceNumber,
+    );
+    if (isOnWinningPathFlag) {
+      nextIndex = nextLocations[unlockedPieceKeys[0]];
+      newPieceInfo = updatePieceInfo(
+        newPieceInfo,
+        unlockedPieceKeys[0],
+        "isOnWinningPath",
+        true,
       );
-      newInfo = updatePieceInfo(
-        newInfo,
-        pieceKeys[0],
+      if (nextIndex === 6) {
+        newPieceInfo = updatePieceInfo(
+          newPieceInfo,
+          unlockedPieceKeys[0],
+          "isCompleted",
+          true,
+        );
+      }
+      newPieceInfo = updatePieceInfo(
+        newPieceInfo,
+        unlockedPieceKeys[0],
         "boxIndex",
-        nextLocations[pieceKeys[0]],
+        nextIndex,
       );
-      console.log("Nemesis unlocked piece", pieceKeys[0]);
-      return newInfo;
+      newPieceInfo = updatePieceInfo(
+        newPieceInfo,
+        unlockedPieceKeys[0],
+        "location",
+        nemesisPieceInfo[unlockedPieceKeys[0]].winningPath[nextIndex],
+      );
+    } else {
+      newPieceInfo = updatePieceInfo(
+        nemesisPieceInfo,
+        unlockedPieceKeys[0],
+        "location",
+        all_constants.REGULAR_PATH[nextLocations[unlockedPieceKeys[0]]],
+      );
+      newPieceInfo = updatePieceInfo(
+        newPieceInfo,
+        unlockedPieceKeys[0],
+        "boxIndex",
+        nextLocations[unlockedPieceKeys[0]],
+      );
+      console.log("Nemesis unlocked piece", unlockedPieceKeys[0]);
     }
+    return newPieceInfo;
   }
 
   // if unlockedPieces, move them

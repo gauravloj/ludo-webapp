@@ -12,9 +12,7 @@ import {
   isMovePossible,
   canUnlock,
   updatePieceInfo,
-  getNextLocation,
-  isOnWinningPath,
-  checkCollision,
+  movePlayerPiece,
 } from "../gameplay";
 import { movePiece } from "../playerAI";
 import { initializeAllPlayers, p } from "../helper";
@@ -39,9 +37,9 @@ export function GameBoard({ startGameHandler }) {
   const all_players = initializeAllPlayers(player_color);
   // Uncomment to test specific cases
   // all_players.player[1].location = 81;
-  // all_players.nemesis[1].location = 4;
   // all_players.player[1].boxIndex = 49;
-  // all_players.nemesis[1].boxIndex = 22;
+  // all_players.nemesis[1].location = 80; // 4;
+  // all_players.nemesis[1].boxIndex = 50; // 22;
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const homeBoxClickHandler = (pieceId, message) => {
@@ -103,63 +101,17 @@ export function GameBoard({ startGameHandler }) {
     if (currentUserState !== all_constants.USER_STATES.pendingPieceSelection) {
       return;
     }
-    let isWinningPath = isOnWinningPath(playerPieceInfo[key], rolledNumber);
-    let newPieceInfo;
-    if (isWinningPath) {
-      let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
-      newPieceInfo = updatePieceInfo(
-        playerPieceInfo,
-        key,
-        "isOnWinningPath",
-        true,
-      );
-      if (nextIndex === 6) {
-        newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
-      }
-      newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
-      newPieceInfo = updatePieceInfo(
-        newPieceInfo,
-        key,
-        "location",
-        playerPieceInfo[key].winningPath[nextIndex],
-      );
-    } else {
-      let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
-      newPieceInfo = updatePieceInfo(
-        playerPieceInfo,
-        key,
-        "boxIndex",
-        nextIndex,
-      );
-      newPieceInfo = updatePieceInfo(
-        newPieceInfo,
-        key,
-        "location",
-        all_constants.REGULAR_PATH[nextIndex],
-      );
-      let [isCollison, collisionKey] = checkCollision(
-        nextIndex,
-        nemesisPieceInfo,
-      );
-      if (isCollison) {
-        p("Nemesis pieces");
-        let newNemesisPieceInfo;
-        newNemesisPieceInfo = updatePieceInfo(
-          nemesisPieceInfo,
-          collisionKey,
-          "boxIndex",
-          -1,
-        );
-        newNemesisPieceInfo = updatePieceInfo(
-          newNemesisPieceInfo,
-          collisionKey,
-          "location",
-          -1,
-        );
-        setNemesisPieceInfo(newNemesisPieceInfo);
-      }
+
+    let [newPlayerPieceInfo, isCollided, newNemesisPieceInfo] = movePlayerPiece(
+      playerPieceInfo,
+      nemesisPieceInfo,
+      key,
+      rolledNumber,
+    );
+    if (isCollided) {
+      setNemesisPieceInfo(newNemesisPieceInfo);
     }
-    setPlayerPieceInfo(newPieceInfo);
+    setPlayerPieceInfo(newPlayerPieceInfo);
     p("moveBoxClickHandler", "Moved to next box");
     if (rolledNumber === 6) {
       setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
