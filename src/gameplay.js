@@ -109,11 +109,10 @@ export function isOnWinningPath(pieceInfo, rolledNumber) {
   );
 }
 export function checkCollision(piecePosition, pieceInfo) {
+  if ([-1, 6, 7, 20, 28, 45, 53, 75, 76].includes(piecePosition)) return false;
   let collidedPieces = Object.keys(pieceInfo).filter((piece) => {
     return pieceInfo[piece].location === piecePosition;
   });
-
-  // TODO: Add logice to check safe boxes
 
   return [collidedPieces.length === 1, collidedPieces[0]];
 }

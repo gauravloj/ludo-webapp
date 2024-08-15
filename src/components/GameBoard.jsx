@@ -38,8 +38,15 @@ export function GameBoard({ startGameHandler }) {
   // Uncomment to test specific cases
   // all_players.player[1].location = 81;
   // all_players.player[1].boxIndex = 49;
-  // all_players.nemesis[1].location = 80; // 4;
-  // all_players.nemesis[1].boxIndex = 50; // 22;
+  all_players.nemesis[4].location = 24; // 4;
+  all_players.nemesis[4].boxIndex = 17; // 22;
+  all_players.nemesis[3].location = 73; // 4;
+  all_players.nemesis[3].boxIndex = 1;
+  all_players.nemesis[2].location = 66; // 4;
+  all_players.nemesis[2].boxIndex = 44;
+  all_players.nemesis[1].location = 12; // 4;
+  all_players.nemesis[1].boxIndex = 28;
+
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
   const homeBoxClickHandler = (pieceId, message) => {
