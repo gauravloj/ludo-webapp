@@ -68,56 +68,92 @@ function unlockNemesisPiece(nemesisPieceInfo) {
 function moveSelectedNemesisPiece(
   nemesisPieceInfo,
   key,
-  nextBoxIndex,
-  diceNumber,
+  nextBoxObject,
+  playerPieceInfo,
 ) {
-  let newPieceInfo = nemesisPieceInfo;
-  let isOnWinningPathFlag = isOnWinningPath(newPieceInfo[key], diceNumber);
+  let newNemesisPieceInfo = nemesisPieceInfo;
+  let newPlayerPieceInfo = playerPieceInfo;
+  let isCollided = false;
+  let isOnWinningPathFlag = nextBoxObject.isOnWinningPath;
+  let nextIndex = nextBoxObject.nextBoxIndex;
   if (isOnWinningPathFlag) {
-    let nextIndex = nextBoxIndex.boxIndex;
-    newPieceInfo = updatePieceInfo(newPieceInfo, key, "isOnWinningPath", true);
+    newNemesisPieceInfo = updatePieceInfo(
+      newNemesisPieceInfo,
+      key,
+      "isOnWinningPath",
+      true,
+    );
     if (nextIndex === 6) {
-      newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
+      newNemesisPieceInfo = updatePieceInfo(
+        newNemesisPieceInfo,
+        key,
+        "isCompleted",
+        true,
+      );
     }
-    newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
-    newPieceInfo = updatePieceInfo(
-      newPieceInfo,
+    newNemesisPieceInfo = updatePieceInfo(
+      newNemesisPieceInfo,
+      key,
+      "boxIndex",
+      nextIndex,
+    );
+    newNemesisPieceInfo = updatePieceInfo(
+      newNemesisPieceInfo,
       key,
       "location",
       nemesisPieceInfo[key].winningPath[nextIndex],
     );
   } else {
-    newPieceInfo = updatePieceInfo(
+    newNemesisPieceInfo = updatePieceInfo(
       nemesisPieceInfo,
       key,
       "location",
-      all_constants.REGULAR_PATH[nextBoxIndex.boxIndex],
+      all_constants.REGULAR_PATH[nextIndex],
     );
-    newPieceInfo = updatePieceInfo(
-      newPieceInfo,
+    newNemesisPieceInfo = updatePieceInfo(
+      newNemesisPieceInfo,
       key,
       "boxIndex",
-      nextBoxIndex.boxIndex,
+      nextIndex,
     );
+    let collidedKey;
+    [isCollided, collidedKey] = checkCollision(
+      all_constants.REGULAR_PATH[nextIndex],
+      playerPieceInfo,
+    );
+    if (isCollided) {
+      newPlayerPieceInfo = updatePieceInfo(
+        newPlayerPieceInfo,
+        collidedKey,
+        "location",
+        -1,
+      );
+      newPlayerPieceInfo = updatePieceInfo(
+        newPlayerPieceInfo,
+        collidedKey,
+        "boxIndex",
+        -1,
+      );
+    }
+
     console.log("Nemesis unlocked piece", key);
   }
-  return newPieceInfo;
+  return [newNemesisPieceInfo, newPlayerPieceInfo, isCollided];
 }
 
 function checkIfCanKill(nextBoxIndexes, playerPieceInfo) {
-  for (let nemesisPieceKey in nextBoxIndexes) {
-    if (
-      !nextBoxIndexes[nemesisPieceKey].isOnWinningPath &&
-      checkCollision(
-        all_constants.REGULAR_PATH[nextBoxIndexes[nemesisPieceKey]],
-        playerPieceInfo,
-      )
-    ) {
-      return nemesisPieceKey;
+  for (let nemesisPiece of nextBoxIndexes) {
+    let [isCollided] = checkCollision(
+      all_constants.REGULAR_PATH[nemesisPiece.nextBoxIndex],
+      playerPieceInfo,
+    );
+    if (!nemesisPiece.isOnWinningPath && isCollided) {
+      return nemesisPiece.keyName;
     }
   }
   return undefined;
 }
+
 function checkForUnsafePiece(
   unlockedPieceKeys,
   nemesisPieceInfo,
@@ -143,38 +179,18 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
   let nextIndex;
   let lockedPieces = getLockedPiecesCount(nemesisPieceInfo);
   if ((diceNumber === 6 || diceNumber === 1) && lockedPieces > 0) {
-    return unlockNemesisPiece(nemesisPieceInfo);
+    // third param is 'isCollided' which is false for this case
+    return [unlockNemesisPiece(nemesisPieceInfo), playerPieceInfo, false];
   }
 
   // Get all next location to make the next strategic move
   if (lockedPieces < 4) {
-    let unlockedPieceKeys = Object.keys(nemesisPieceInfo).filter(
-      (piece) =>
-        nemesisPieceInfo[piece].location !== -1 &&
-        !nemesisPieceInfo[piece].isCompleted,
+    let unlockedPieceKeys = getUnlockedPieceKeys(nemesisPieceInfo);
+    let nextBoxIndexes = sortNextBoxIndices(
+      unlockedPieceKeys,
+      nemesisPieceInfo,
+      diceNumber,
     );
-    let nextBoxIndexes = [];
-    unlockedPieceKeys.forEach((keyName) => {
-      let currentInfo = {};
-      currentInfo["nextBoxIndex"] = getNextNemesisBoxIndex(
-        nemesisPieceInfo[keyName],
-        diceNumber,
-      );
-      currentInfo["isOnWinningPath"] = isOnWinningPath(
-        nemesisPieceInfo[keyName],
-        diceNumber,
-      );
-      currentInfo["keyName"] = keyName;
-      nextBoxIndexes.push(currentInfo);
-    });
-    //sort based on box indices
-    nextBoxIndexes.sort(function (a, b) {
-      let c = JSON.parse(JSON.stringify(a));
-      let d = JSON.parse(JSON.stringify(b));
-      if (c.nextBoxIndex >= 26) c.nextBoxIndex -= 51;
-      if (d.nextBoxIndex >= 26) d.nextBoxIndex -= 51;
-      return d.nextBoxIndex - c.nextBoxIndex;
-    });
 
     let selectedKey = undefined;
     // Selection logic
@@ -202,14 +218,48 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
     }
     return moveSelectedNemesisPiece(
       nemesisPieceInfo,
-      unlockedPieceKeys[selectedKey],
+      selectedKey,
       nextBoxIndexes.filter((piece) => piece.keyName == selectedKey)[0],
-      diceNumber,
+      playerPieceInfo,
     );
   }
 
   console.log("Nemesis Moved Piece");
-  return nemesisPieceInfo;
+  return [nemesisPieceInfo, playerPieceInfo, false];
+}
+
+function sortNextBoxIndices(unlockedPieceKeys, nemesisPieceInfo, diceNumber) {
+  let nextBoxIndexes = [];
+  unlockedPieceKeys.forEach((keyName) => {
+    let currentInfo = {};
+    currentInfo["nextBoxIndex"] = getNextNemesisBoxIndex(
+      nemesisPieceInfo[keyName],
+      diceNumber,
+    );
+    currentInfo["isOnWinningPath"] = isOnWinningPath(
+      nemesisPieceInfo[keyName],
+      diceNumber,
+    );
+    currentInfo["keyName"] = keyName;
+    nextBoxIndexes.push(currentInfo);
+  });
+  //sort based on box indices
+  nextBoxIndexes.sort(function (a, b) {
+    let aBoxIndex = a.nextBoxIndex;
+    let bBoxIndex = b.nextBoxIndex;
+    if (aBoxIndex >= 26) aBoxIndex -= 51;
+    if (bBoxIndex >= 26) bBoxIndex -= 51;
+    return bBoxIndex - aBoxIndex;
+  });
+  return nextBoxIndexes;
+}
+
+function getUnlockedPieceKeys(nemesisPieceInfo) {
+  return Object.keys(nemesisPieceInfo).filter(
+    (piece) =>
+      nemesisPieceInfo[piece].location !== -1 &&
+      !nemesisPieceInfo[piece].isCompleted,
+  );
 }
 
 function changeState() {}

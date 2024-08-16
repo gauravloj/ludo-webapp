@@ -36,16 +36,23 @@ export function GameBoard({ startGameHandler }) {
   };
   const all_players = initializeAllPlayers(player_color);
   // Uncomment to test specific cases
-  // all_players.player[1].location = 81;
-  // all_players.player[1].boxIndex = 49;
-  all_players.nemesis[4].location = 24; // 4;
-  all_players.nemesis[4].boxIndex = 17; // 22;
-  all_players.nemesis[3].location = 73; // 4;
-  all_players.nemesis[3].boxIndex = 1;
-  all_players.nemesis[2].location = 66; // 4;
-  all_players.nemesis[2].boxIndex = 44;
-  all_players.nemesis[1].location = 12; // 4;
-  all_players.nemesis[1].boxIndex = 28;
+  // all_players.player[1].location = 70;
+  // all_players.player[1].boxIndex = 2;
+  // all_players.player[4].location = 67;
+  // all_players.player[4].boxIndex = 3;
+  // all_players.player[3].location = 64;
+  // all_players.player[3].boxIndex = 4;
+  // all_players.player[2].location = 48;
+  // all_players.player[2].boxIndex = 5;
+
+  // all_players.nemesis[4].location = 79; // 4;
+  // all_players.nemesis[4].boxIndex = 51; // 22;
+  // all_players.nemesis[3].location = 73; // 4;
+  // all_players.nemesis[3].boxIndex = 1;
+  // all_players.nemesis[2].location = 80; // 4;
+  // all_players.nemesis[2].boxIndex = 50;
+  // all_players.nemesis[1].location = 76; // 4;
+  // all_players.nemesis[1].boxIndex = 0;
 
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
@@ -72,8 +79,15 @@ export function GameBoard({ startGameHandler }) {
     p(`In nemesis Roll function: ${canMove}`);
     if (canMove) {
       p("nemesisRoll: ", "Nemesis can move");
-      let nextState = movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo);
-      setNemesisPieceInfo(nextState);
+      let [nextNemesisState, nextPlayerPieceInfo, isCollided] = movePiece(
+        diceNumber,
+        nemesisPieceInfo,
+        playerPieceInfo,
+      );
+      setNemesisPieceInfo(nextNemesisState);
+      if (isCollided) {
+        setPlayerPieceInfo(nextPlayerPieceInfo);
+      }
       setMessages([`Nemesis rolled ${diceNumber}`, `Nemesis played the turn`]);
     } else {
       p("nemesisRoll: ", "Nemesis cannot move");
