@@ -5,6 +5,7 @@ export function getLockedPiecesCount(playerPieceInfo) {
   return Object.values(playerPieceInfo).filter((piece) => piece.location === -1)
     .length;
 }
+
 export function isMovePossible(pieceInfo, rolledNumber) {
   if (getLockedPiecesCount(pieceInfo) == 4 && ![1, 6].includes(rolledNumber)) {
     return false;
@@ -12,7 +13,9 @@ export function isMovePossible(pieceInfo, rolledNumber) {
   //Add other conditions
   return true;
 }
+
 export const colorSymbol = Symbol("color");
+
 export function getInitialPieceInfo(
   pieceColor,
   startBoxIndex,
@@ -108,15 +111,21 @@ export function isOnWinningPath(pieceInfo, rolledNumber) {
       all_constants.PLAYER_CONSTANTS.endBoxIndex
   );
 }
-export function checkCollision(piecePosition, pieceInfo) {
-  if ([-1, 6, 7, 20, 28, 45, 53, 75, 76].includes(piecePosition)) {
+export function checkCollision(pieceBoxIndex, pieceInfo) {
+  if (isSafeBox(pieceBoxIndex)) {
     return [false];
   }
+
+  let pieceLocation = all_constants.REGULAR_PATH[pieceBoxIndex];
   let collidedPieces = Object.keys(pieceInfo).filter((piece) => {
-    return pieceInfo[piece].location === piecePosition;
+    return pieceInfo[piece].location === pieceLocation;
   });
 
   return [collidedPieces.length === 1, collidedPieces[0]];
+}
+
+export function isSafeBox(pieceBoxIndex) {
+  return [-1, 0, 8, 13, 21, 26, 34, 39, 47].includes(pieceBoxIndex);
 }
 
 export function movePlayerPiece(
@@ -157,10 +166,7 @@ export function movePlayerPiece(
       "location",
       all_constants.REGULAR_PATH[nextIndex],
     );
-    [isCollison, collisionKey] = checkCollision(
-      all_constants.REGULAR_PATH[nextIndex],
-      nemesisPieceInfo,
-    );
+    [isCollison, collisionKey] = checkCollision(nextIndex, nemesisPieceInfo);
     if (isCollison) {
       p("Nemesis pieces");
       newNemesisPieceInfo = updatePieceInfo(
