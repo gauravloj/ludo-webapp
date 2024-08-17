@@ -14,7 +14,7 @@ import {
   updatePieceInfo,
   movePlayerPiece,
 } from "../gameplay";
-import { movePiece } from "../playerAI";
+import { movePiece } from "../nemesisAI";
 import { initializeAllPlayers, p } from "../helper";
 
 export function GameBoard({ startGameHandler }) {
@@ -36,23 +36,25 @@ export function GameBoard({ startGameHandler }) {
   };
   const all_players = initializeAllPlayers(player_color);
   // Uncomment to test specific cases
-  // all_players.player[1].location = 70;
-  // all_players.player[1].boxIndex = 2;
-  // all_players.player[4].location = 67;
-  // all_players.player[4].boxIndex = 3;
-  // all_players.player[3].location = 64;
-  // all_players.player[3].boxIndex = 4;
+  // all_players.player[1].location = 10;
+  // all_players.player[1].boxIndex = 20;
+  // all_players.player[4].location = 76;
+  // all_players.player[4].boxIndex = 0;
+  // all_players.player[3].location = 2;
+  // all_players.player[3].boxIndex = 24;
   // all_players.player[2].location = 48;
   // all_players.player[2].boxIndex = 5;
 
-  // all_players.nemesis[4].location = 79; // 4;
-  // all_players.nemesis[4].boxIndex = 51; // 22;
-  // all_players.nemesis[3].location = 73; // 4;
+  // all_players.nemesis[4].location = 5; // 4;
+  // all_players.nemesis[4].boxIndex = 1; // 22;
+  // all_players.nemesis[4].isOnWinningPath = true;
+  // all_players.nemesis[3].location = 5; // 4;
   // all_players.nemesis[3].boxIndex = 1;
+  // all_players.nemesis[3].isOnWinningPath = true;
   // all_players.nemesis[2].location = 80; // 4;
   // all_players.nemesis[2].boxIndex = 50;
-  // all_players.nemesis[1].location = 76; // 4;
-  // all_players.nemesis[1].boxIndex = 0;
+  // all_players.nemesis[1].location = 18; // 4;
+  // all_players.nemesis[1].boxIndex = 30;
 
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);

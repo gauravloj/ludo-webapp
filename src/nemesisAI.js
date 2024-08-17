@@ -23,7 +23,7 @@ export function playNemesis(rollDie, nemesisRoll, setCurrentUserState) {
 function getNextNemesisBoxIndex(pieceInfo, rolledNumber) {
   if (pieceInfo.isOnWinningPath) {
     if (pieceInfo.boxIndex + rolledNumber > 6) {
-      return pieceInfo.boxIndex;
+      return null;
     }
     return pieceInfo.boxIndex + rolledNumber;
   }
@@ -152,19 +152,39 @@ function checkIfCanKill(nextBoxIndexes, playerPieceInfo) {
   return undefined;
 }
 
-function isSafeBoxIndex(pieceBoxIndex, playerPieceInfo) {
+function isSafeBoxIndex(
+  key,
+  pieceBoxIndex,
+  isOnWinningPath,
+  playerPieceInfo,
+  nemesisPieceInfo,
+) {
   // boxIndex 51 is safe assuming that player will
   // go to winning path instead of killing nemesis
-  if (isSafeBox(pieceBoxIndex) || pieceBoxIndex === 51) {
+  if (isSafeBox(pieceBoxIndex) || pieceBoxIndex === 51 || isOnWinningPath) {
     return true;
   }
-
-  for (let playerPiece of playerPieceInfo) {
-    if (pieceBoxIndex - playerPiece.boxIndex <= 6) {
+  for (let nemesisPieceKey in nemesisPieceInfo) {
+    let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
+    if (
+      !nemesisPiece.isOnWinningPath &&
+      key != nemesisPiece.keyName &&
+      nemesisPiece.boxIndex === pieceBoxIndex
+    ) {
       return true;
     }
   }
-  return false;
+  for (let playerPieceKey in playerPieceInfo) {
+    let playerPiece = playerPieceInfo[playerPieceKey];
+    if (
+      playerPiece.boxIndex !== -1 &&
+      pieceBoxIndex - playerPiece.boxIndex <= 6 &&
+      pieceBoxIndex - playerPiece.boxIndex > 0
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function checkForUnsafePiece(
@@ -172,7 +192,6 @@ function checkForUnsafePiece(
   nemesisPieceInfo,
   nextBoxIndexes,
   playerPieceInfo,
-  diceNumber,
 ) {
   // Check if two pieces are at the same location
   // let indexCount = {};
@@ -184,7 +203,13 @@ function checkForUnsafePiece(
     let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
     if (
       !nemesisPiece.isOnWinningPath &&
-      !isSafeBoxIndex(nemesisPiece.boxIndex, playerPieceInfo)
+      !isSafeBoxIndex(
+        nemesisPieceKey,
+        nemesisPiece.boxIndex,
+        nemesisPiece.isOnWinningPath,
+        playerPieceInfo,
+        nemesisPieceInfo,
+      )
     ) {
       let nextBoxInfo = nextBoxIndexes.filter(
         (piece) => piece.keyName === nemesisPieceKey,
@@ -192,30 +217,63 @@ function checkForUnsafePiece(
 
       if (
         nextBoxInfo &&
-        isSafeBoxIndex(nextBoxInfo.nextBoxIndex, playerPieceInfo)
+        isSafeBoxIndex(
+          nemesisPieceKey,
+          nextBoxInfo.nextBoxIndex,
+          nextBoxInfo.isOnWinningPath,
+          playerPieceInfo,
+          nemesisPieceInfo,
+        )
       ) {
         return nemesisPieceKey;
       }
+    }
+  }
+  return undefined;
+}
+function moveToSafePlacePiece(
+  unlockedPieceKeys,
+  nemesisPieceInfo,
+  nextBoxIndexes,
+  playerPieceInfo,
+) {
+  // Check if two pieces are at the same location
+  // let indexCount = {};
+  // Object.entries(nemesisPieceInfo).reduce((acc, currVal) => {
+  //   acc[currVal.boxIndex] = (acc[currVal.boxIndex]  || 0)+ 1;
+  // }, indexCount);
 
-      // if the piece is already on the winning path, move the piece
-      // that is closest to the winning path
-      if (nemesisPiece.isOnWinningPath) {
-        return nemesisPiece.keyName;
+  for (let nemesisPieceKey of unlockedPieceKeys) {
+    let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
+    if (!nemesisPiece.isOnWinningPath) {
+      let nextBoxInfo = nextBoxIndexes.filter(
+        (piece) => piece.keyName === nemesisPieceKey,
+      )[0];
+
+      if (
+        nextBoxInfo &&
+        isSafeBoxIndex(
+          nemesisPieceKey,
+          nextBoxInfo.nextBoxIndex,
+          nextBoxInfo.isOnWinningPath,
+          playerPieceInfo,
+          nemesisPieceInfo,
+        )
+      ) {
+        return nemesisPieceKey;
       }
     }
   }
-
-  // for (let nemesisPieceKey of nextBoxIndexes) {
-  //   let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
-  //   if (!nemesisPiece.isOnWinningPath) {
-  //     for (let playerPieceKey of playerPieceInfo) {
-  //       if (playerPieceInfo.boxIndex + 6 - nemesisPiece.boxIndex > 0) {
-  //       }
-  //       //TODO: Fix this check first
-  //     }
-  //     return nemesisPieceKey;
-  //   }
-  // }
+  return undefined;
+}
+function nextPieceToMove(unlockedPieceKeys, nemesisPieceInfo) {
+  for (let nemesisPieceKey of unlockedPieceKeys) {
+    let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
+    if (nemesisPiece.isOnWinningPath) {
+      return nemesisPieceKey;
+    }
+  }
+  return unlockedPieceKeys[unlockedPieceKeys.length - 1];
 }
 
 export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
@@ -235,30 +293,50 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
       nemesisPieceInfo,
       diceNumber,
     );
-
+    unlockedPieceKeys = nextBoxIndexes.map(
+      (nextBoxIndex) => nextBoxIndex.keyName,
+    );
     let selectedKey = undefined;
     // Selection logic
+    // Checks to be done:
+    // 1. Can piece be unlocked?
+    // 2. Can piece kill
+    // 3. Can piece be moved from unsafe to safe position
+    // 4. Can piece be moved from safe to safe position
+    // 5. Move winning path piece
+    // TODO: 6. Move highest unsafe piece to unsafe
+    // 7. Move lowest safe piece safe to unsafe
+
     let killKey = checkIfCanKill(nextBoxIndexes, playerPieceInfo);
     if (killKey) {
       selectedKey = killKey;
     } else {
-      checkForUnsafePiece(
+      let unsafePieceKey = checkForUnsafePiece(
         unlockedPieceKeys,
         nemesisPieceInfo,
         nextBoxIndexes,
         playerPieceInfo,
-        diceNumber,
       );
-      // else, move the piece that is closest to the winning path
-
-      // if the piece is already on the winning path, move the piece
-      // that is closest to the winning path
-
-      // if player piece is few steps behind, move that nemesis piece
-
-      // if player piece ahead of nemesis can be killed by nemesis, move that piece
-
-      // else play the first unlocked piece
+      if (unsafePieceKey) {
+        selectedKey = unsafePieceKey;
+      } else {
+        let moveToSafePlacePieceKey = moveToSafePlacePiece(
+          unlockedPieceKeys,
+          nemesisPieceInfo,
+          nextBoxIndexes,
+          playerPieceInfo,
+        );
+        if (moveToSafePlacePieceKey) {
+          selectedKey = moveToSafePlacePieceKey;
+        } else {
+          selectedKey = nextPieceToMove(
+            unlockedPieceKeys,
+            nemesisPieceInfo,
+            nextBoxIndexes,
+            playerPieceInfo,
+          );
+        }
+      }
     }
     return moveSelectedNemesisPiece(
       nemesisPieceInfo,
@@ -275,17 +353,20 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
 function sortNextBoxIndices(unlockedPieceKeys, nemesisPieceInfo, diceNumber) {
   let nextBoxIndexes = [];
   unlockedPieceKeys.forEach((keyName) => {
-    let currentInfo = {};
-    currentInfo["nextBoxIndex"] = getNextNemesisBoxIndex(
+    let nextBoxIndex = getNextNemesisBoxIndex(
       nemesisPieceInfo[keyName],
       diceNumber,
     );
-    currentInfo["isOnWinningPath"] = isOnWinningPath(
-      nemesisPieceInfo[keyName],
-      diceNumber,
-    );
-    currentInfo["keyName"] = keyName;
-    nextBoxIndexes.push(currentInfo);
+    if (nextBoxIndex !== null) {
+      let currentInfo = {};
+      currentInfo["nextBoxIndex"] = nextBoxIndex;
+      currentInfo["isOnWinningPath"] = isOnWinningPath(
+        nemesisPieceInfo[keyName],
+        diceNumber,
+      );
+      currentInfo["keyName"] = keyName;
+      nextBoxIndexes.push(currentInfo);
+    }
   });
   //sort based on box indices
   nextBoxIndexes.sort(function (a, b) {
@@ -295,6 +376,7 @@ function sortNextBoxIndices(unlockedPieceKeys, nemesisPieceInfo, diceNumber) {
     if (bBoxIndex >= 26) bBoxIndex -= 51;
     return bBoxIndex - aBoxIndex;
   });
+
   return nextBoxIndexes;
 }
 
