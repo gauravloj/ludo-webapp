@@ -168,7 +168,7 @@ function isSafeBoxIndex(
     let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
     if (
       !nemesisPiece.isOnWinningPath &&
-      key != nemesisPiece.keyName &&
+      key != nemesisPieceKey &&
       nemesisPiece.boxIndex === pieceBoxIndex
     ) {
       return true;
@@ -266,6 +266,46 @@ function moveToSafePlacePiece(
   }
   return undefined;
 }
+
+function moveUnsafeToUnsafePieceKey(
+  unlockedPieceKeys,
+  nemesisPieceInfo,
+  nextBoxIndexes,
+  playerPieceInfo,
+) {
+  for (let nemesisPieceKey of unlockedPieceKeys) {
+    let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
+    if (
+      !nemesisPiece.isOnWinningPath &&
+      !isSafeBoxIndex(
+        nemesisPieceKey,
+        nemesisPiece.boxIndex,
+        nemesisPiece.isOnWinningPath,
+        playerPieceInfo,
+        nemesisPieceInfo,
+      )
+    ) {
+      let nextBoxInfo = nextBoxIndexes.filter(
+        (piece) => piece.keyName === nemesisPieceKey,
+      )[0];
+
+      if (
+        nextBoxInfo &&
+        !isSafeBoxIndex(
+          nemesisPieceKey,
+          nextBoxInfo.nextBoxIndex,
+          nextBoxInfo.isOnWinningPath,
+          playerPieceInfo,
+          nemesisPieceInfo,
+        )
+      ) {
+        return nemesisPieceKey;
+      }
+    }
+  }
+  return undefined;
+}
+
 function nextPieceToMove(unlockedPieceKeys, nemesisPieceInfo) {
   for (let nemesisPieceKey of unlockedPieceKeys) {
     let nemesisPiece = nemesisPieceInfo[nemesisPieceKey];
@@ -277,8 +317,18 @@ function nextPieceToMove(unlockedPieceKeys, nemesisPieceInfo) {
 }
 
 export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
+  // Selection logic
+  // Checks to be done:
+  // 1. Can piece be unlocked?
+  // 2. Can piece kill
+  // 3. Can piece be moved from unsafe to safe position
+  // 4. Can piece be moved from safe to safe position
+  // 5. Move highest unsafe piece to unsafe
+  // 6. Move winning path piece
+  // 7. Move lowest safe piece safe to unsafe
+
   // check for lockedPieces
-  let nextIndex;
+  // 1. Can piece be unlocked?
   let lockedPieces = getLockedPiecesCount(nemesisPieceInfo);
   if ((diceNumber === 6 || diceNumber === 1) && lockedPieces > 0) {
     // third param is 'isCollided' which is false for this case
@@ -297,20 +347,13 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
       (nextBoxIndex) => nextBoxIndex.keyName,
     );
     let selectedKey = undefined;
-    // Selection logic
-    // Checks to be done:
-    // 1. Can piece be unlocked?
-    // 2. Can piece kill
-    // 3. Can piece be moved from unsafe to safe position
-    // 4. Can piece be moved from safe to safe position
-    // 5. Move winning path piece
-    // TODO: 6. Move highest unsafe piece to unsafe
-    // 7. Move lowest safe piece safe to unsafe
 
+    // 2. Can piece kill
     let killKey = checkIfCanKill(nextBoxIndexes, playerPieceInfo);
     if (killKey) {
       selectedKey = killKey;
     } else {
+      // 3. Can piece be moved from unsafe to safe position
       let unsafePieceKey = checkForUnsafePiece(
         unlockedPieceKeys,
         nemesisPieceInfo,
@@ -320,6 +363,7 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
       if (unsafePieceKey) {
         selectedKey = unsafePieceKey;
       } else {
+        // 4. Can piece be moved from safe to safe position
         let moveToSafePlacePieceKey = moveToSafePlacePiece(
           unlockedPieceKeys,
           nemesisPieceInfo,
@@ -329,12 +373,26 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
         if (moveToSafePlacePieceKey) {
           selectedKey = moveToSafePlacePieceKey;
         } else {
-          selectedKey = nextPieceToMove(
+          // 5. Move highest unsafe piece to unsafe
+          let unsafeToUnsafePieceKey = moveUnsafeToUnsafePieceKey(
             unlockedPieceKeys,
             nemesisPieceInfo,
             nextBoxIndexes,
             playerPieceInfo,
           );
+
+          if (unsafeToUnsafePieceKey) {
+            selectedKey = unsafeToUnsafePieceKey;
+          } else {
+            // 6. Move winning path piece
+            // 7. Move lowest safe piece safe to unsafe
+            selectedKey = nextPieceToMove(
+              unlockedPieceKeys,
+              nemesisPieceInfo,
+              nextBoxIndexes,
+              playerPieceInfo,
+            );
+          }
         }
       }
     }
@@ -387,5 +445,3 @@ function getUnlockedPieceKeys(nemesisPieceInfo) {
       !nemesisPieceInfo[piece].isCompleted,
   );
 }
-
-function changeState() {}

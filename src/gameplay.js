@@ -10,8 +10,29 @@ export function isMovePossible(pieceInfo, rolledNumber) {
   if (getLockedPiecesCount(pieceInfo) == 4 && ![1, 6].includes(rolledNumber)) {
     return false;
   }
-  //Add other conditions
-  return true;
+
+  let isPossible = false;
+  for (let key in pieceInfo) {
+    let piece = pieceInfo[key];
+    if (piece.isOnWinningPath) {
+      if (piece.boxIndex + rolledNumber <= 6) {
+        isPossible = true;
+        break;
+      }
+    } else {
+      if (piece.location !== -1) {
+        isPossible = true;
+        break;
+      } else {
+        isPossible = [1, 6].includes(rolledNumber);
+        if (isPossible) {
+          break;
+        }
+      }
+    }
+  }
+
+  return isPossible;
 }
 
 export const colorSymbol = Symbol("color");
