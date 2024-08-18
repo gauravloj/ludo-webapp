@@ -135,6 +135,7 @@ const USER_STATES = {
   pendingPieceSelection: "pendingPieceSelection",
   pendingNemesisTurn: "pendingNemesisTurn",
   pendingSecondNemesisTurn: "pendingSecondNemesisTurn",
+  gameOver: "gameOver",
 };
 
 export const all_constants = {

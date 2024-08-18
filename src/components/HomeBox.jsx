@@ -6,7 +6,11 @@ function PieceHome({ color }) {
   return <button className={`rounded-full ${color} h-1/2 w-1/2`}></button>;
 }
 
-export function HomeBox({ isPieceEnabled, pieceInfo, onClickHandler }) {
+export function HomeBox({
+  isPieceEnabled,
+  pieceInfo,
+  onClickHandler = () => {},
+}) {
   return (
     <div
       className={`w-full h-full border-solid border-2 border-black ${pieceInfo[colorSymbol]} flex justify-center items-center`}

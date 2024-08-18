@@ -6,7 +6,7 @@ import { FinalDestination } from "./FinalDestination";
 import { InfoBox } from "./InfoBox";
 import { all_constants } from "../constants";
 import { Dice, diceFrontMap } from "./Dice";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   isMovePossible,
@@ -17,6 +17,43 @@ import {
 import { movePiece } from "../nemesisAI";
 import { initializeAllPlayers, p } from "../helper";
 
+function initializeForDebugging(player_color) {
+  let all_players = initializeAllPlayers(player_color);
+  all_players.player[1].location = -666;
+  all_players.player[1].boxIndex = 6;
+  all_players.player[1].isOnWinningPath = true;
+  all_players.player[1].isCompleted = true;
+  all_players.player[2].location = -666;
+  all_players.player[2].boxIndex = 6;
+  all_players.player[2].isOnWinningPath = true;
+  all_players.player[2].isCompleted = true;
+  all_players.player[3].location = -666;
+  all_players.player[3].boxIndex = 6;
+  all_players.player[3].isOnWinningPath = true;
+  all_players.player[3].isCompleted = true;
+  all_players.player[4].location = 74;
+  all_players.player[4].boxIndex = 2;
+  all_players.player[4].isOnWinningPath = true;
+
+  all_players.nemesis[1].location = -666;
+  all_players.nemesis[1].boxIndex = 6;
+  all_players.nemesis[1].isOnWinningPath = true;
+  all_players.nemesis[1].isCompleted = true;
+  all_players.nemesis[2].location = -666;
+  all_players.nemesis[2].boxIndex = 6;
+  all_players.nemesis[2].isOnWinningPath = true;
+  all_players.nemesis[2].isCompleted = true;
+  all_players.nemesis[3].location = -666;
+  all_players.nemesis[3].boxIndex = 6;
+  all_players.nemesis[3].isOnWinningPath = true;
+  all_players.nemesis[3].isCompleted = true;
+  all_players.nemesis[4].location = 8;
+  all_players.nemesis[4].boxIndex = 2;
+  all_players.nemesis[4].isOnWinningPath = true;
+
+  return all_players;
+}
+
 export function GameBoard({ startGameHandler }) {
   const [messages, setMessages] = useState([]);
   const [rolledNumber, setRolledNumber] = useState(1);
@@ -25,6 +62,8 @@ export function GameBoard({ startGameHandler }) {
   );
   let [isShowing, setIsShowing] = useState(true);
   let [diceFront, setDiceFront] = useState(diceFrontMap["1"]);
+  let nemesisTimeOut = useRef(null);
+
   const player_color = localStorage.getItem("selectedColor");
   const player_color_index = all_constants.COLOR_SEQUENCE.indexOf(player_color);
   const corner_color_map = {
@@ -34,35 +73,12 @@ export function GameBoard({ startGameHandler }) {
     top_left: all_constants.COLOR_SEQUENCE[(player_color_index + 3) % 4],
     common: all_constants.COLORS.white,
   };
-  const all_players = initializeAllPlayers(player_color);
-  // Uncomment to test specific cases
-  // all_players.player[1].location = 10;
-  // all_players.player[1].boxIndex = 20;
-  // all_players.player[4].location = 76;
-  // all_players.player[4].boxIndex = 0;
-  // all_players.player[3].location = 2;
-  // all_players.player[3].boxIndex = 24;
-  // all_players.player[2].location = 48;
-  // all_players.player[2].boxIndex = 5;
-
-  // all_players.nemesis[4].location = 5; // 4;
-  // all_players.nemesis[4].boxIndex = 1; // 22;
-  // all_players.nemesis[4].isOnWinningPath = true;
-  // all_players.nemesis[3].location = 5; // 4;
-  // all_players.nemesis[3].boxIndex = 1;
-  // all_players.nemesis[3].isOnWinningPath = true;
-  // all_players.nemesis[2].location = 80; // 4;
-  // all_players.nemesis[2].boxIndex = 50;
-  // all_players.nemesis[1].location = 18; // 4;
-  // all_players.nemesis[1].boxIndex = 30;
+  const all_players = initializeForDebugging(player_color);
 
   const [playerPieceInfo, setPlayerPieceInfo] = useState(all_players.player);
   const [nemesisPieceInfo, setNemesisPieceInfo] = useState(all_players.nemesis);
-  const homeBoxClickHandler = (pieceId, message) => {
-    p("Clicked piece id:", pieceId, message);
-  };
+
   const playerRoll = (diceNumber) => {
-    p("In playerRoll");
     let canMove = isMovePossible(playerPieceInfo, diceNumber);
     if (canMove) {
       setMessages([`You rolled ${diceNumber}`, `Select a piece to move`]);
@@ -75,24 +91,25 @@ export function GameBoard({ startGameHandler }) {
       setCurrentUserState(all_constants.USER_STATES.pendingNemesisTurn);
     }
   };
+
   const nemesisRoll = (diceNumber) => {
-    p("In nemesisRoll");
     let canMove = isMovePossible(nemesisPieceInfo, diceNumber);
-    p(`In nemesis Roll function: ${canMove}`);
+
     if (canMove) {
-      p("nemesisRoll: ", "Nemesis can move");
-      let [nextNemesisState, nextPlayerPieceInfo, isCollided] = movePiece(
-        diceNumber,
-        nemesisPieceInfo,
-        playerPieceInfo,
-      );
+      let [nextNemesisState, nextPlayerPieceInfo, isCollided, hasWon] =
+        movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo);
+      if (hasWon) {
+        setMessages(["Nemesis won the game", "Game over"]);
+        setNemesisPieceInfo(nextNemesisState);
+        setCurrentUserState(all_constants.USER_STATES.gameOver);
+        return;
+      }
       setNemesisPieceInfo(nextNemesisState);
       if (isCollided) {
         setPlayerPieceInfo(nextPlayerPieceInfo);
       }
       setMessages([`Nemesis rolled ${diceNumber}`, `Nemesis played the turn`]);
     } else {
-      p("nemesisRoll: ", "Nemesis cannot move");
       setMessages([
         "No valid moves available for Nemesis",
         `Your turn to roll the dice`,
@@ -125,17 +142,18 @@ export function GameBoard({ startGameHandler }) {
       return;
     }
 
-    let [newPlayerPieceInfo, isCollided, newNemesisPieceInfo] = movePlayerPiece(
-      playerPieceInfo,
-      nemesisPieceInfo,
-      key,
-      rolledNumber,
-    );
+    let [newPlayerPieceInfo, isCollided, newNemesisPieceInfo, hasWon] =
+      movePlayerPiece(playerPieceInfo, nemesisPieceInfo, key, rolledNumber);
+    if (hasWon) {
+      setMessages(["You won the game", "Game over"]);
+      setPlayerPieceInfo(newPlayerPieceInfo);
+      setCurrentUserState(all_constants.USER_STATES.gameOver);
+      return;
+    }
     if (isCollided) {
       setNemesisPieceInfo(newNemesisPieceInfo);
     }
     setPlayerPieceInfo(newPlayerPieceInfo);
-    p("moveBoxClickHandler", "Moved to next box");
     if (rolledNumber === 6) {
       setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
     } else {
@@ -144,17 +162,13 @@ export function GameBoard({ startGameHandler }) {
   };
 
   useEffect(() => {
-    p("useEffect: ", "Current user state", currentUserState);
     if (
       currentUserState === all_constants.USER_STATES.pendingNemesisTurn ||
       currentUserState === all_constants.USER_STATES.pendingSecondNemesisTurn
     ) {
-      p("useEffect: ", "Nemesis turn");
-
-      setTimeout(() => {
+      nemesisTimeOut.current = setTimeout(() => {
         rollDie((diceNumber) => {
           nemesisRoll(diceNumber);
-          p("rollDie: ", "Nemesis played", diceNumber);
         });
       }, 3000);
     }
@@ -195,6 +209,9 @@ export function GameBoard({ startGameHandler }) {
               setNemesisPieceInfo(all_players.nemesis);
               setMessages(["Game restarted"]);
               setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+              if (nemesisTimeOut.current) {
+                clearTimeout(nemesisTimeOut.current);
+              }
               startGameHandler(true);
             }}
           />
@@ -204,9 +221,6 @@ export function GameBoard({ startGameHandler }) {
             <HomeBox
               isPieceEnabled={false}
               pieceInfo={all_players.minion_too}
-              onClickHandler={(key) => {
-                homeBoxClickHandler(key, "Clicked minion too");
-              }}
             />
           </div>
 
@@ -214,13 +228,7 @@ export function GameBoard({ startGameHandler }) {
           {getMoveBox(2)}
           {getMoveBox(3)}
           <div className="col-span-6 row-span-6">
-            <HomeBox
-              isPieceEnabled={false}
-              pieceInfo={nemesisPieceInfo}
-              onClickHandler={(key) => {
-                homeBoxClickHandler(key, "Clicked nemesis");
-              }}
-            />
+            <HomeBox isPieceEnabled={false} pieceInfo={nemesisPieceInfo} />
           </div>
 
           {Array(21)
@@ -248,7 +256,6 @@ export function GameBoard({ startGameHandler }) {
               }
               pieceInfo={playerPieceInfo}
               onClickHandler={(key) => {
-                homeBoxClickHandler(key, "Clicked player");
                 let pieceInfo = playerPieceInfo[key];
                 if (canUnlock(rolledNumber)) {
                   let nextIndex = pieceInfo.startBoxIndex;
@@ -286,9 +293,6 @@ export function GameBoard({ startGameHandler }) {
             <HomeBox
               isPieceEnabled={false}
               pieceInfo={all_players.minion_one}
-              onClickHandler={(key) => {
-                homeBoxClickHandler(key, "Clicked minion one");
-              }}
             />
           </div>
 

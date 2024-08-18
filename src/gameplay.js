@@ -1,5 +1,4 @@
 import { all_constants } from "./constants";
-import { p } from "./helper";
 
 export function getLockedPiecesCount(playerPieceInfo) {
   return Object.values(playerPieceInfo).filter((piece) => piece.location === -1)
@@ -149,6 +148,10 @@ export function isSafeBox(pieceBoxIndex) {
   return [-1, 0, 8, 13, 21, 26, 34, 39, 47].includes(pieceBoxIndex);
 }
 
+export function isGameWon(pieceInfo) {
+  return Object.values(pieceInfo).every((piece) => piece.isCompleted);
+}
+
 export function movePlayerPiece(
   playerPieceInfo,
   nemesisPieceInfo,
@@ -156,8 +159,9 @@ export function movePlayerPiece(
   rolledNumber,
 ) {
   let newNemesisPieceInfo = nemesisPieceInfo;
-  let isCollison = false,
-    collisionKey;
+  let isCollison = false;
+  let collisionKey;
+  let hasWon = false;
   let isWinningPath = isOnWinningPath(playerPieceInfo[key], rolledNumber);
   let newPieceInfo;
   if (isWinningPath) {
@@ -168,9 +172,6 @@ export function movePlayerPiece(
       "isOnWinningPath",
       true,
     );
-    if (nextIndex === 6) {
-      newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
-    }
     newPieceInfo = updatePieceInfo(newPieceInfo, key, "boxIndex", nextIndex);
     newPieceInfo = updatePieceInfo(
       newPieceInfo,
@@ -178,6 +179,10 @@ export function movePlayerPiece(
       "location",
       playerPieceInfo[key].winningPath[nextIndex],
     );
+    if (nextIndex === 6) {
+      newPieceInfo = updatePieceInfo(newPieceInfo, key, "isCompleted", true);
+      hasWon = isGameWon(newPieceInfo);
+    }
   } else {
     let nextIndex = getNextLocation(playerPieceInfo[key], rolledNumber);
     newPieceInfo = updatePieceInfo(playerPieceInfo, key, "boxIndex", nextIndex);
@@ -189,7 +194,6 @@ export function movePlayerPiece(
     );
     [isCollison, collisionKey] = checkCollision(nextIndex, nemesisPieceInfo);
     if (isCollison) {
-      p("Nemesis pieces");
       newNemesisPieceInfo = updatePieceInfo(
         nemesisPieceInfo,
         collisionKey,
@@ -205,5 +209,5 @@ export function movePlayerPiece(
     }
   }
 
-  return [newPieceInfo, isCollison, newNemesisPieceInfo];
+  return [newPieceInfo, isCollison, newNemesisPieceInfo, hasWon];
 }

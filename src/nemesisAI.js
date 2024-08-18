@@ -2,6 +2,7 @@ import { all_constants } from "./constants";
 import {
   checkCollision,
   getLockedPiecesCount,
+  isGameWon,
   isSafeBox,
   updatePieceInfo,
 } from "./gameplay";
@@ -9,15 +10,9 @@ import {
 export function playNemesis(rollDie, nemesisRoll, setCurrentUserState) {
   rollDie((diceNumber) => {
     nemesisRoll(diceNumber);
-    console.log("Nemesis played");
     movePiece();
     setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
   });
-
-  //   setTimeout(() => {
-  //     console.log("Nemesis finished playing");
-  //     finishTurnCallback();
-  //   }, 1000);
 }
 
 function getNextNemesisBoxIndex(pieceInfo, rolledNumber) {
@@ -62,7 +57,6 @@ function unlockNemesisPiece(nemesisPieceInfo) {
     all_constants.REGULAR_PATH[nextIndex],
   );
   newInfo = updatePieceInfo(newInfo, toUnlock, "boxIndex", nextIndex);
-  console.log("Nemesis unlocked piece", toUnlock);
   return newInfo;
 }
 
@@ -75,6 +69,7 @@ function moveSelectedNemesisPiece(
   let newNemesisPieceInfo = nemesisPieceInfo;
   let newPlayerPieceInfo = playerPieceInfo;
   let isCollided = false;
+  let hasWon = false;
   let isOnWinningPathFlag = nextBoxObject.isOnWinningPath;
   let nextIndex = nextBoxObject.nextBoxIndex;
   if (isOnWinningPathFlag) {
@@ -84,14 +79,6 @@ function moveSelectedNemesisPiece(
       "isOnWinningPath",
       true,
     );
-    if (nextIndex === 6) {
-      newNemesisPieceInfo = updatePieceInfo(
-        newNemesisPieceInfo,
-        key,
-        "isCompleted",
-        true,
-      );
-    }
     newNemesisPieceInfo = updatePieceInfo(
       newNemesisPieceInfo,
       key,
@@ -104,6 +91,15 @@ function moveSelectedNemesisPiece(
       "location",
       nemesisPieceInfo[key].winningPath[nextIndex],
     );
+    if (nextIndex === 6) {
+      newNemesisPieceInfo = updatePieceInfo(
+        newNemesisPieceInfo,
+        key,
+        "isCompleted",
+        true,
+      );
+      hasWon = isGameWon(newNemesisPieceInfo);
+    }
   } else {
     newNemesisPieceInfo = updatePieceInfo(
       nemesisPieceInfo,
@@ -133,10 +129,8 @@ function moveSelectedNemesisPiece(
         -1,
       );
     }
-
-    console.log("Nemesis unlocked piece", key);
   }
-  return [newNemesisPieceInfo, newPlayerPieceInfo, isCollided];
+  return [newNemesisPieceInfo, newPlayerPieceInfo, isCollided, hasWon];
 }
 
 function checkIfCanKill(nextBoxIndexes, playerPieceInfo) {
@@ -330,6 +324,7 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
   // check for lockedPieces
   // 1. Can piece be unlocked?
   let lockedPieces = getLockedPiecesCount(nemesisPieceInfo);
+  let hasWon = false;
   if ((diceNumber === 6 || diceNumber === 1) && lockedPieces > 0) {
     // third param is 'isCollided' which is false for this case
     return [unlockNemesisPiece(nemesisPieceInfo), playerPieceInfo, false];
@@ -404,8 +399,7 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
     );
   }
 
-  console.log("Nemesis Moved Piece");
-  return [nemesisPieceInfo, playerPieceInfo, false];
+  return [nemesisPieceInfo, playerPieceInfo, false, false];
 }
 
 function sortNextBoxIndices(unlockedPieceKeys, nemesisPieceInfo, diceNumber) {
