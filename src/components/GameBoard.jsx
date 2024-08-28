@@ -6,6 +6,7 @@ import { FinalDestination } from "./FinalDestination";
 import { InfoBox } from "./InfoBox";
 import { all_constants } from "../constants";
 import { Dice, diceFrontMap } from "./Dice";
+import { EndGamePopup } from "./EndGamePopup";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -19,7 +20,7 @@ import { initializeAllPlayers, p } from "../helper";
 
 function initializeForDebugging(player_color) {
   let all_players = initializeAllPlayers(player_color);
-  all_players.player[1].location = -666;
+  /* all_players.player[1].location = -666;
   all_players.player[1].boxIndex = 6;
   all_players.player[1].isOnWinningPath = true;
   all_players.player[1].isCompleted = true;
@@ -49,7 +50,7 @@ function initializeForDebugging(player_color) {
   all_players.nemesis[3].isCompleted = true;
   all_players.nemesis[4].location = 8;
   all_players.nemesis[4].boxIndex = 2;
-  all_players.nemesis[4].isOnWinningPath = true;
+  all_players.nemesis[4].isOnWinningPath = true;*/
 
   return all_players;
 }
@@ -62,6 +63,8 @@ export function GameBoard({ startGameHandler }) {
   );
   let [isShowing, setIsShowing] = useState(true);
   let [diceFront, setDiceFront] = useState(diceFrontMap["1"]);
+  let [isOpen, setIsOpen] = useState(false);
+  const endGameWinner = useRef("");
   let nemesisTimeOut = useRef(null);
 
   const player_color = localStorage.getItem("selectedColor");
@@ -94,35 +97,67 @@ export function GameBoard({ startGameHandler }) {
 
   const nemesisRoll = (diceNumber) => {
     let canMove = isMovePossible(nemesisPieceInfo, diceNumber);
-
+    let isCollided = false;
     if (canMove) {
-      let [nextNemesisState, nextPlayerPieceInfo, isCollided, hasWon] =
+      let [nextNemesisState, nextPlayerPieceInfo, isCollision, hasWon] =
         movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo);
+      isCollided = isCollision;
       if (hasWon) {
         setMessages(["Nemesis won the game", "Game over"]);
         setNemesisPieceInfo(nextNemesisState);
         setCurrentUserState(all_constants.USER_STATES.gameOver);
+        endGameWinner.current = "nemesis";
+        setIsOpen(true);
         return;
       }
       setNemesisPieceInfo(nextNemesisState);
       if (isCollided) {
         setPlayerPieceInfo(nextPlayerPieceInfo);
       }
-      setMessages([`Nemesis rolled ${diceNumber}`, `Nemesis played the turn`]);
-    } else {
-      setMessages([
-        "No valid moves available for Nemesis",
-        `Your turn to roll the dice`,
-      ]);
     }
-    if (diceNumber == 6) {
+    if (canMove && diceNumber == 6) {
       setCurrentUserState(
         currentUserState == all_constants.USER_STATES.pendingSecondNemesisTurn
           ? all_constants.USER_STATES.pendingNemesisTurn
           : all_constants.USER_STATES.pendingSecondNemesisTurn,
       );
+      if (isCollided) {
+        setMessages([
+          `Nemesis rolled ${diceNumber}`,
+          `Nemesis played the turn`,
+          `Nemesis killed your piece`,
+          `Nemesis will roll dice again`,
+        ]);
+      } else {
+        setMessages([
+          `Nemesis rolled ${diceNumber}`,
+          `Nemesis played the turn`,
+          `Nemesis will roll dice again`,
+        ]);
+      }
     } else {
       setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+      if (canMove) {
+        if (isCollided) {
+          setMessages([
+            `Nemesis rolled ${diceNumber}`,
+            `Nemesis played the turn`,
+            `Nemesis killed your piece`,
+            `Your turn to roll dice`,
+          ]);
+        } else {
+          setMessages([
+            `Nemesis rolled ${diceNumber}`,
+            `Nemesis played the turn`,
+            `Your turn to roll dice`,
+          ]);
+        }
+      } else {
+        setMessages([
+          `No valid moves available for Nemesis`,
+          `Your turn to roll the dice`,
+        ]);
+      }
     }
   };
 
@@ -148,6 +183,8 @@ export function GameBoard({ startGameHandler }) {
       setMessages(["You won the game", "Game over"]);
       setPlayerPieceInfo(newPlayerPieceInfo);
       setCurrentUserState(all_constants.USER_STATES.gameOver);
+      endGameWinner.current = "player";
+      setIsOpen(true);
       return;
     }
     if (isCollided) {
@@ -156,8 +193,18 @@ export function GameBoard({ startGameHandler }) {
     setPlayerPieceInfo(newPlayerPieceInfo);
     if (rolledNumber === 6) {
       setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
+      if (isCollided) {
+        setMessages(["You killed nemesis piece", "Your turn to roll again"]);
+      } else {
+        setMessages(["You played a piece", "Your turn to roll again"]);
+      }
     } else {
       setCurrentUserState(all_constants.USER_STATES.pendingNemesisTurn);
+      if (isCollided) {
+        setMessages(["You killed nemesis piece", "Nemesis turn to roll"]);
+      } else {
+        setMessages(["You played a piece", "Nemesis turn to roll"]);
+      }
     }
   };
 
@@ -272,15 +319,19 @@ export function GameBoard({ startGameHandler }) {
                     all_constants.REGULAR_PATH[nextIndex],
                   );
                   setPlayerPieceInfo(newPieceInfo);
-                  setMessages(["Unlocked piece", `Computer rolls next`]);
                   if (rolledNumber === 6) {
                     setCurrentUserState(
                       all_constants.USER_STATES.pendingDiceRoll,
                     );
+                    setMessages([
+                      "You unlocked piece",
+                      `Your turn to roll again`,
+                    ]);
                   } else {
                     setCurrentUserState(
                       all_constants.USER_STATES.pendingNemesisTurn,
                     );
+                    setMessages(["You unlocked piece", `Nemesis rolls next`]);
                   }
                 }
               }}
@@ -307,7 +358,11 @@ export function GameBoard({ startGameHandler }) {
 
           <div className="mt-8 flex flex-col items-center m-8">
             <Dice diceFront={diceFront} isShowing={isShowing} />
-
+            <EndGamePopup
+              winner={endGameWinner.current}
+              isOpen={isOpen}
+              updatePopupState={setIsOpen}
+            />
             <Button
               id="diceButtonId"
               disabled={

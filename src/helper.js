@@ -38,5 +38,4 @@ export function initializeAllPlayers(player_color) {
 export function p() {
   console.log(...arguments);
 }
-
 // export const helperFunction = { initializeAllPlayers, p };
