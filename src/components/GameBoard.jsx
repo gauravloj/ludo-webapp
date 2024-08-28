@@ -20,10 +20,10 @@ import { initializeAllPlayers, p } from "../helper";
 
 function initializeForDebugging(player_color) {
   let all_players = initializeAllPlayers(player_color);
-  /* all_players.player[1].location = -666;
-  all_players.player[1].boxIndex = 6;
+  all_players.player[1].location = 68;
+  all_players.player[1].boxIndex = 4;
   all_players.player[1].isOnWinningPath = true;
-  all_players.player[1].isCompleted = true;
+  /* all_players.player[1].isCompleted = true;
   all_players.player[2].location = -666;
   all_players.player[2].boxIndex = 6;
   all_players.player[2].isOnWinningPath = true;

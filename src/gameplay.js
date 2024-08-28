@@ -1,4 +1,5 @@
 import { all_constants } from "./constants";
+import { p } from "./helper";
 
 export function getLockedPiecesCount(playerPieceInfo) {
   return Object.values(playerPieceInfo).filter((piece) => piece.location === -1)
@@ -9,7 +10,6 @@ export function isMovePossible(pieceInfo, rolledNumber) {
   if (getLockedPiecesCount(pieceInfo) == 4 && ![1, 6].includes(rolledNumber)) {
     return false;
   }
-
   let isPossible = false;
   for (let key in pieceInfo) {
     let piece = pieceInfo[key];
@@ -101,9 +101,6 @@ export function updatePieceInfo(pieceInfo, pieceIndex, keyName, newValue) {
   return oldValue;
 }
 
-export function isMoveValid(pieceInfo, rolledNumber, pieceIndex) {
-  return true;
-}
 export function getNextLocation(pieceInfo, rolledNumber) {
   if (pieceInfo.isOnWinningPath) {
     if (pieceInfo.boxIndex + rolledNumber > 6) {
