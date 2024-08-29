@@ -13,7 +13,7 @@ export function MoveBox({
   let to_rotate = -45;
   return (
     <div
-      className={`grid grid-cols-1 w-8 h-8 border-solid border-2 border-black ${boxColor}`}
+      className={`grid grid-cols-1 w-full h-full border-solid border-2 border-black ${boxColor}`}
     >
       {idx}
 

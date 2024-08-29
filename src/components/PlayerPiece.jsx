@@ -3,6 +3,7 @@ import { all_constants } from "../constants";
 export function PlayerPiece({ disabled, color, boxColor, onClick }) {
   return (
     <svg
+      className="cursor-pointer"
       viewBox="0 0 24 24"
       fill="none"
       stroke="#000000"

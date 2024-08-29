@@ -20,10 +20,10 @@ import { initializeAllPlayers, p } from "../helper";
 
 function initializeForDebugging(player_color) {
   let all_players = initializeAllPlayers(player_color);
-  all_players.player[1].location = 68;
+  /* all_players.player[1].location = 68;
   all_players.player[1].boxIndex = 4;
   all_players.player[1].isOnWinningPath = true;
-  /* all_players.player[1].isCompleted = true;
+  all_players.player[1].isCompleted = true;
   all_players.player[2].location = -666;
   all_players.player[2].boxIndex = 6;
   all_players.player[2].isOnWinningPath = true;
@@ -238,9 +238,93 @@ export function GameBoard({ startGameHandler }) {
   };
 
   return (
-    <>
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <div className="flex flex-col">
+    <div className="flex justify-center items-center space-x-8 min-h-screen justify-items-stretch bg-gray-100">
+      <div className="basis-1/2 aspect-square grid grid-cols-15 auto-rows-fr gap-0 p-8">
+        <div className="col-span-6 row-span-6">
+          <HomeBox isPieceEnabled={false} pieceInfo={all_players.minion_too} />
+        </div>
+
+        {getMoveBox(1)}
+        {getMoveBox(2)}
+        {getMoveBox(3)}
+        <div className="col-span-6 row-span-6">
+          <HomeBox isPieceEnabled={false} pieceInfo={nemesisPieceInfo} />
+        </div>
+
+        {Array(21)
+          .fill(1)
+          .map((option, i) => {
+            return getMoveBox(i + 4);
+          })}
+        <div className="col-span-3 row-span-3">
+          <FinalDestination
+            playerPieces={playerPieceInfo}
+            nemesisPieces={nemesisPieceInfo}
+          />
+        </div>
+        {Array(30)
+          .fill(1)
+          .map((option, i) => {
+            return getMoveBox(i + 25);
+          })}
+
+        <div className="col-span-6 row-span-6">
+          <HomeBox
+            isPieceEnabled={
+              currentUserState ==
+              all_constants.USER_STATES.pendingPieceSelection
+            }
+            pieceInfo={playerPieceInfo}
+            onClickHandler={(key) => {
+              let pieceInfo = playerPieceInfo[key];
+              if (canUnlock(rolledNumber)) {
+                let nextIndex = pieceInfo.startBoxIndex;
+                let newPieceInfo = updatePieceInfo(
+                  playerPieceInfo,
+                  key,
+                  "boxIndex",
+                  nextIndex,
+                );
+                newPieceInfo = updatePieceInfo(
+                  newPieceInfo,
+                  key,
+                  "location",
+                  all_constants.REGULAR_PATH[nextIndex],
+                );
+                setPlayerPieceInfo(newPieceInfo);
+                if (rolledNumber === 6) {
+                  setCurrentUserState(
+                    all_constants.USER_STATES.pendingDiceRoll,
+                  );
+                  setMessages([
+                    "You unlocked piece",
+                    `Your turn to roll again`,
+                  ]);
+                } else {
+                  setCurrentUserState(
+                    all_constants.USER_STATES.pendingNemesisTurn,
+                  );
+                  setMessages(["You unlocked piece", `Nemesis rolls next`]);
+                }
+              }
+            }}
+          />
+        </div>
+        {getMoveBox(64)}
+        {getMoveBox(65)}
+        {getMoveBox(66)}
+        <div className="col-span-6 row-span-6">
+          <HomeBox isPieceEnabled={false} pieceInfo={all_players.minion_one} />
+        </div>
+
+        {Array(15)
+          .fill(1)
+          .map((option, i) => {
+            return getMoveBox(i + 67);
+          })}
+      </div>
+      <div className="basis-1/5 h-full pr-8 flex flex-col justify-evenly">
+        <div className="flex flex-col basis-1/3">
           <ActionButton
             text="Home"
             onClick={() => {
@@ -263,121 +347,31 @@ export function GameBoard({ startGameHandler }) {
             }}
           />
         </div>
-        <div className="grid grid-cols-15 gap-0">
-          <div className="col-span-6 row-span-6">
-            <HomeBox
-              isPieceEnabled={false}
-              pieceInfo={all_players.minion_too}
-            />
-          </div>
-
-          {getMoveBox(1)}
-          {getMoveBox(2)}
-          {getMoveBox(3)}
-          <div className="col-span-6 row-span-6">
-            <HomeBox isPieceEnabled={false} pieceInfo={nemesisPieceInfo} />
-          </div>
-
-          {Array(21)
-            .fill(1)
-            .map((option, i) => {
-              return getMoveBox(i + 4);
-            })}
-          <div className="col-span-3 row-span-3">
-            <FinalDestination
-              playerPieces={playerPieceInfo}
-              nemesisPieces={nemesisPieceInfo}
-            />
-          </div>
-          {Array(30)
-            .fill(1)
-            .map((option, i) => {
-              return getMoveBox(i + 25);
-            })}
-
-          <div className="col-span-6 row-span-6">
-            <HomeBox
-              isPieceEnabled={
-                currentUserState ==
-                all_constants.USER_STATES.pendingPieceSelection
-              }
-              pieceInfo={playerPieceInfo}
-              onClickHandler={(key) => {
-                let pieceInfo = playerPieceInfo[key];
-                if (canUnlock(rolledNumber)) {
-                  let nextIndex = pieceInfo.startBoxIndex;
-                  let newPieceInfo = updatePieceInfo(
-                    playerPieceInfo,
-                    key,
-                    "boxIndex",
-                    nextIndex,
-                  );
-                  newPieceInfo = updatePieceInfo(
-                    newPieceInfo,
-                    key,
-                    "location",
-                    all_constants.REGULAR_PATH[nextIndex],
-                  );
-                  setPlayerPieceInfo(newPieceInfo);
-                  if (rolledNumber === 6) {
-                    setCurrentUserState(
-                      all_constants.USER_STATES.pendingDiceRoll,
-                    );
-                    setMessages([
-                      "You unlocked piece",
-                      `Your turn to roll again`,
-                    ]);
-                  } else {
-                    setCurrentUserState(
-                      all_constants.USER_STATES.pendingNemesisTurn,
-                    );
-                    setMessages(["You unlocked piece", `Nemesis rolls next`]);
-                  }
-                }
-              }}
-            />
-          </div>
-          {getMoveBox(64)}
-          {getMoveBox(65)}
-          {getMoveBox(66)}
-          <div className="col-span-6 row-span-6">
-            <HomeBox
-              isPieceEnabled={false}
-              pieceInfo={all_players.minion_one}
-            />
-          </div>
-
-          {Array(15)
-            .fill(1)
-            .map((option, i) => {
-              return getMoveBox(i + 67);
-            })}
-        </div>
-        <div>
+        <div className="flex flex-col basis-1/3">
           <InfoBox messages={messages} />
+        </div>
 
-          <div className="mt-8 flex flex-col items-center m-8">
-            <Dice diceFront={diceFront} isShowing={isShowing} />
-            <EndGamePopup
-              winner={endGameWinner.current}
-              isOpen={isOpen}
-              updatePopupState={setIsOpen}
-            />
-            <Button
-              id="diceButtonId"
-              disabled={
-                currentUserState !== all_constants.USER_STATES.pendingDiceRoll
-              }
-              onClick={() => {
-                rollDie(playerRoll);
-              }}
-              className="mt-10 flex items-center gap-2 rounded-full bg-white/10 py-1 px-3 text-sm/6 font-semibold transition data-[hover]:scale-105 data-[hover]:bg-white/15"
-            >
-              <span>Roll that die!</span>
-            </Button>
-          </div>
+        <div className="mt-8 flex flex-col items-center m-4 basis-1/3">
+          <Dice diceFront={diceFront} isShowing={isShowing} />
+          <EndGamePopup
+            winner={endGameWinner.current}
+            isOpen={isOpen}
+            updatePopupState={setIsOpen}
+          />
+          <Button
+            id="diceButtonId"
+            disabled={
+              currentUserState !== all_constants.USER_STATES.pendingDiceRoll
+            }
+            onClick={() => {
+              rollDie(playerRoll);
+            }}
+            className="mt-10 flex items-center gap-2 rounded-full bg-white/10 py-1 px-3 text-sm/6 font-semibold transition data-[hover]:scale-105 data-[hover]:bg-white/15"
+          >
+            <span>Roll that die!</span>
+          </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

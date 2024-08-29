@@ -3,7 +3,7 @@ import { colorSymbol } from "../gameplay";
 import { PlayerPiece } from "./PlayerPiece";
 
 function PieceHome({ color }) {
-  return <button className={`rounded-full ${color} h-1/2 w-1/2`}></button>;
+  return <div className={`rounded-full ${color} h-1/2 w-1/2`}></div>;
 }
 
 export function HomeBox({
@@ -15,7 +15,7 @@ export function HomeBox({
     <div
       className={`w-full h-full border-solid border-2 border-black ${pieceInfo[colorSymbol]} flex justify-center items-center`}
     >
-      <div className="m-2 rotate-45 w-4/6 h-4/6 bg-white rounded-xl grid grid-cols-2 grid-rows-2 place-items-center">
+      <div className="m-2 rotate-45 w-2/3 h-2/3 bg-white rounded-xl grid grid-cols-2 grid-rows-2 place-items-center">
         {Object.keys(pieceInfo).map((key) => {
           let piece = pieceInfo[key];
           return piece.location === -1 ? (
