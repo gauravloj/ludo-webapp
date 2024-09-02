@@ -103,7 +103,7 @@ const CORNER_INDICES = {
 const PLAYER_CONSTANTS = {
   startBoxIndex: 0,
   endBoxIndex: 50,
-  winningPath: [-666, 77, 74, 71, 68, 65, -666],
+  winningPath: [-666, 77, 74, 71, 68, 65, -666], // TODO: Change last value to 666
 };
 
 const NEMESIS_CONSTANTS = {
