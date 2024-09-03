@@ -5,7 +5,7 @@ import { PlayerPiece } from "./PlayerPiece";
 export function FinalDestination({ playerPieces, nemesisPieces }) {
   return (
     <div
-      className={`w-full h-full border-solid border-2 border-black bg-pink-200 flex justify-center items-center`}
+      className={`w-full h-full border-solid border border-black bg-pink-200 flex justify-center items-center`}
     >
       <div className="w-4/6 h-4/6 bg-white rounded-xl grid grid-cols-4 place-items-center">
         {Object.keys(nemesisPieces).map((key) => {

@@ -13,7 +13,7 @@ export function HomeBox({
 }) {
   return (
     <div
-      className={`w-full h-full border-solid border-2 border-black ${pieceInfo[colorSymbol]} flex justify-center items-center`}
+      className={`w-full h-full border-solid border border-black ${pieceInfo[colorSymbol]} flex justify-center items-center`}
     >
       <div className="m-2 rotate-45 w-2/3 h-2/3 bg-white rounded-xl grid grid-cols-2 grid-rows-2 place-items-center">
         {Object.keys(pieceInfo).map((key) => {

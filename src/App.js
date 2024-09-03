@@ -8,9 +8,13 @@ export default function App() {
   let startGameHandler = (state) => {
     setStart(state);
   };
-  return startGame ? (
-    <GameBoard startGameHandler={startGameHandler} />
-  ) : (
-    <LandingPage startGameHandler={startGameHandler} />
+  return (
+    <div className="bg-pink-50 w-screen h-screen">
+      {startGame ? (
+        <GameBoard startGameHandler={startGameHandler} />
+      ) : (
+        <LandingPage startGameHandler={startGameHandler} />
+      )}
+    </div>
   );
 }

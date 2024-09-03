@@ -238,7 +238,7 @@ export function GameBoard({ startGameHandler }) {
   };
 
   return (
-    <div className="flex justify-center items-center space-x-8 min-h-screen justify-items-stretch bg-gray-100">
+    <div className="flex justify-center items-center space-x-8 min-h-screen justify-items-stretch">
       <div className="basis-1/2 aspect-square grid grid-cols-15 auto-rows-fr gap-0 p-8">
         <div className="col-span-6 row-span-6">
           <HomeBox isPieceEnabled={false} pieceInfo={all_players.minion_too} />

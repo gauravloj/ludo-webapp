@@ -7,7 +7,7 @@ export function PlayerPiece({ disabled, color, boxColor, onClick }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="#000000"
-      strokeWidth="0.9359999999999999"
+      strokeWidth="0.535"
       onClick={onClick}
       disabled={disabled}
     >
