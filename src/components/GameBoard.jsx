@@ -323,8 +323,8 @@ export function GameBoard({ startGameHandler }) {
             return getMoveBox(i + 67);
           })}
       </div>
-      <div className="basis-1/5 h-full pr-8 flex flex-col justify-evenly">
-        <div className="flex flex-col basis-1/3">
+      <div className="basis-1/5 h-full pr-8 grid grid-col-1 grid-rows-10">
+        <div className="row-span-2 flex flex-col basis-1/3">
           <ActionButton
             text="Home"
             onClick={() => {
@@ -347,11 +347,12 @@ export function GameBoard({ startGameHandler }) {
             }}
           />
         </div>
-        <div className="flex flex-col basis-1/3">
+
+        <div className="row-span-5 flex flex-col basis-1/3">
           <InfoBox messages={messages} />
         </div>
 
-        <div className="mt-8 flex flex-col items-center m-4 basis-1/3">
+        <div className="row-span-3 mt-8 flex flex-col items-center m-4 basis-1/3">
           <Dice diceFront={diceFront} isShowing={isShowing} />
           <EndGamePopup
             winner={endGameWinner.current}
