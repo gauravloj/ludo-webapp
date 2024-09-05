@@ -10,6 +10,7 @@ export function HomeBox({
   isPieceEnabled,
   pieceInfo,
   onClickHandler = () => {},
+  isPlayer = false,
 }) {
   return (
     <div
@@ -20,6 +21,7 @@ export function HomeBox({
           let piece = pieceInfo[key];
           return piece.location === -1 ? (
             <PlayerPiece
+              isPlayer={isPlayer}
               disabled={!isPieceEnabled}
               key={key}
               color={all_constants.COLORS_HEX[pieceInfo[colorSymbol]]}

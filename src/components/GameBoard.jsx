@@ -270,6 +270,7 @@ export function GameBoard({ startGameHandler }) {
 
         <div className="col-span-6 row-span-6">
           <HomeBox
+            isPlayer={true}
             isPieceEnabled={
               currentUserState ==
               all_constants.USER_STATES.pendingPieceSelection

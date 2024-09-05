@@ -1,9 +1,9 @@
 import { all_constants } from "../constants";
 
-export function PlayerPiece({ disabled, color, boxColor, onClick }) {
+export function PlayerPiece({ disabled, color, boxColor, onClick, isPlayer }) {
   return (
     <svg
-      className="cursor-pointer"
+      className={isPlayer && "cursor-pointer"}
       viewBox="0 0 24 24"
       fill="none"
       stroke="#000000"

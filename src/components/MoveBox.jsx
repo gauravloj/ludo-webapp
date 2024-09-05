@@ -48,6 +48,7 @@ export function MoveBox({
               key={key}
             >
               <PlayerPiece
+                isPlayer={true}
                 color={all_constants.COLORS_HEX[playerPieceInfo[colorSymbol]]}
                 boxColor={boxColor}
                 onClick={() => {
