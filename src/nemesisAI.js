@@ -7,14 +7,6 @@ import {
   updatePieceInfo,
 } from "./gameplay";
 
-export function playNemesis(rollDie, nemesisRoll, setCurrentUserState) {
-  rollDie((diceNumber) => {
-    nemesisRoll(diceNumber);
-    movePiece();
-    setCurrentUserState(all_constants.USER_STATES.pendingDiceRoll);
-  });
-}
-
 function getNextNemesisBoxIndex(pieceInfo, rolledNumber) {
   if (pieceInfo.isOnWinningPath) {
     if (pieceInfo.boxIndex + rolledNumber > 6) {
@@ -327,7 +319,12 @@ export function movePiece(diceNumber, nemesisPieceInfo, playerPieceInfo) {
   let hasWon = false;
   if ((diceNumber === 6 || diceNumber === 1) && lockedPieces > 0) {
     // third param is 'isCollided' which is false for this case
-    return [unlockNemesisPiece(nemesisPieceInfo), playerPieceInfo, false];
+    return [
+      unlockNemesisPiece(nemesisPieceInfo),
+      playerPieceInfo,
+      false,
+      false,
+    ];
   }
 
   // Get all next location to make the next strategic move
