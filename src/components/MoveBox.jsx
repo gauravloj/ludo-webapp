@@ -15,8 +15,6 @@ export function MoveBox({
     <div
       className={`grid grid-cols-1 w-full h-full border-solid border border-black ${boxColor}`}
     >
-      {idx}
-
       {Object.keys(nemesisPieceInfo).map((key) => {
         let piece = nemesisPieceInfo[key];
         if (piece.location === idx) {
